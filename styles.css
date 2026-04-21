@@ -923,3 +923,301 @@ button.fono-audio-btn {
   margin-bottom: 8px;
   display: block;
 }
+
+/* ===== CIENCIAS SOCIALES ===== */
+
+/* ── Galería del Territorio y Audiorelato ── */
+.galeria-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.galeria-card {
+  background: linear-gradient(135deg, #f0eeff, #e8f8f5);
+  border: 2px solid #a29bfe;
+  border-radius: 18px;
+  padding: 28px 24px 20px;
+  text-align: center;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 4px 16px rgba(108, 92, 231, 0.12);
+}
+
+.galeria-icon {
+  font-size: 4.5rem;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.galeria-title {
+  font-size: 1.5rem;
+  color: #6c5ce7;
+  margin-bottom: 14px;
+  font-weight: 700;
+}
+
+.galeria-relato {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  border-left: 4px solid #6c5ce7;
+  text-align: left;
+}
+
+.galeria-relato p {
+  color: #444;
+  font-size: 0.97rem;
+  line-height: 1.65;
+}
+
+.galeria-audio-btn {
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    transform 0.15s;
+}
+.galeria-audio-btn:hover {
+  opacity: 0.88;
+  transform: scale(1.04);
+}
+
+.galeria-nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.galeria-dots {
+  display: flex;
+  gap: 7px;
+}
+
+.galeria-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #c8c3f7;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+.galeria-dot.active {
+  background: #6c5ce7;
+  transform: scale(1.3);
+}
+
+/* ── Mapa de Mi Vereda ── */
+.mapa-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mapa-title {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 4px;
+  font-size: 1.15rem;
+}
+
+.mapa-subtitle {
+  text-align: center;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.mapa-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 580px;
+  margin-bottom: 16px;
+}
+
+.mapa-zone {
+  border: 2px dashed #a29bfe;
+  border-radius: 14px;
+  padding: 12px 8px 10px;
+  background: #f8f7ff;
+  text-align: center;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
+}
+
+.mapa-zone-icon {
+  font-size: 2rem;
+  margin-bottom: 4px;
+}
+
+.mapa-zone-hint {
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+.mapa-zone-drop {
+  min-height: 34px;
+  border: 2px dashed #c8c3f7;
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.mapa-zone-drop.drag-over {
+  background: #e8e5ff;
+  border-color: #6c5ce7;
+}
+
+.mapa-drop-placeholder {
+  font-size: 0.75rem;
+  color: #bbb;
+}
+
+.mapa-drop-placed {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6c5ce7;
+}
+
+.mapa-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 580px;
+  padding: 12px;
+  background: #f0eeff;
+  border-radius: 12px;
+  border: 2px dashed #c8c3f7;
+  min-height: 54px;
+}
+
+.mapa-label-chip {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: grab;
+  user-select: none;
+  transition:
+    transform 0.15s,
+    opacity 0.2s;
+}
+.mapa-label-chip:hover {
+  transform: scale(1.06);
+}
+
+/* ── Historia de Mi Familia / Árbol Familiar ── */
+.familia-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.arbol-familiar {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.arbol-row {
+  background: #f8f7ff;
+  border: 2px solid #e0deff;
+  border-radius: 14px;
+  padding: 12px 16px 14px;
+}
+
+.arbol-level-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #6c5ce7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.arbol-nodes {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.arbol-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 110px;
+}
+
+.arbol-node.arbol-yo .arbol-icon {
+  filter: drop-shadow(0 0 6px #6c5ce7);
+}
+
+.arbol-icon {
+  font-size: 2rem;
+}
+
+.arbol-input {
+  width: 120px;
+  padding: 6px 10px;
+  border: 2px solid #a29bfe;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  text-align: center;
+  outline: none;
+  background: #fff;
+  color: #333;
+  transition: border-color 0.2s;
+}
+.arbol-input:focus {
+  border-color: #6c5ce7;
+}
+
+.fam-historia-box {
+  width: 100%;
+  max-width: 580px;
+  margin-top: 16px;
+  background: linear-gradient(135deg, #f0eeff, #e8f8f5);
+  border: 2px solid #a29bfe;
+  border-radius: 14px;
+  padding: 16px 20px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.fam-historia-box h4 {
+  color: #6c5ce7;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.fam-historia-box p {
+  font-size: 0.9rem;
+  color: #444;
+  line-height: 1.6;
+}

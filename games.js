@@ -1438,218 +1438,549 @@ gameRenderers["cuerpo-humano"] = function (area) {
 // ║  CIENCIAS SOCIALES                                              ║
 // ╚══════════════════════════════════════════════════════════════════╝
 
-// ── Países y Capitales ───────────────────────────────────────────────────────
-gameRenderers["paises"] = function (area) {
-  const data = [
-    { country: "Colombia", capital: "Bogotá" },
-    { country: "México", capital: "Ciudad de México" },
-    { country: "Argentina", capital: "Buenos Aires" },
-    { country: "España", capital: "Madrid" },
-    { country: "Perú", capital: "Lima" },
-    { country: "Chile", capital: "Santiago" },
-    { country: "Brasil", capital: "Brasilia" },
-    { country: "Francia", capital: "París" },
-  ];
-
-  let current = 0,
-    score = 0;
-  const shuffled = [...data].sort(() => Math.random() - 0.5);
-
-  function render() {
-    if (current >= shuffled.length) {
-      area.innerHTML = `<div class="game-result"><h2>🎉 ¡Excelente geógrafo!</h2><p>Puntaje: ${score} / ${shuffled.length}</p><button class="game-btn" onclick="gameRenderers['paises'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
-      return;
-    }
-    const item = shuffled[current];
-    const options = [
-      ...new Set([
-        item.capital,
-        ...data
-          .filter((d) => d.capital !== item.capital)
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 3)
-          .map((d) => d.capital),
-      ]),
-    ].sort(() => Math.random() - 0.5);
-
-    area.innerHTML = `
-      <div class="quiz-container">
-        <p class="math-score">Puntaje: ${score} / ${shuffled.length} &nbsp;|&nbsp; Pregunta ${current + 1}</p>
-        <p class="quiz-question">¿Cuál es la capital de <strong>${item.country}</strong>?</p>
-        <div class="multi-options">${options.map((o) => `<button class="option-btn" data-val="${o}">${o}</button>`).join("")}</div>
-        <p id="cap-fb" class="math-feedback"></p>
-      </div>`;
-
-    area.querySelector(".multi-options").addEventListener("click", (e) => {
-      const btn = e.target.closest(".option-btn");
-      if (!btn) return;
-      const fb = document.getElementById("cap-fb");
-      if (btn.dataset.val === item.capital) {
-        score++;
-        btn.style.background = "#2ecc71";
-        fb.textContent = "✅ ¡Correcto!";
-        fb.style.color = "#2ecc71";
-      } else {
-        btn.style.background = "#e74c3c";
-        fb.textContent = `❌ Era: ${item.capital}`;
-        fb.style.color = "#e74c3c";
-      }
-      area.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
-      current++;
-      setTimeout(render, 1000);
-    });
-  }
-  render();
-};
-
-// ── Banderas del Mundo ───────────────────────────────────────────────────────
-gameRenderers["banderas"] = function (area) {
-  const flags = [
-    { country: "Colombia", flag: "🇨🇴" },
-    { country: "México", flag: "🇲🇽" },
-    { country: "Argentina", flag: "🇦🇷" },
-    { country: "Brasil", flag: "🇧🇷" },
-    { country: "España", flag: "🇪🇸" },
-    { country: "Francia", flag: "🇫🇷" },
-    { country: "Japón", flag: "🇯🇵" },
-    { country: "Estados Unidos", flag: "🇺🇸" },
-    { country: "Italia", flag: "🇮🇹" },
-    { country: "Alemania", flag: "🇩🇪" },
-  ];
-
-  let current = 0,
-    score = 0;
-  const shuffled = [...flags].sort(() => Math.random() - 0.5).slice(0, 8);
-
-  function render() {
-    if (current >= shuffled.length) {
-      area.innerHTML = `<div class="game-result"><h2>🎉 ¡Gran conocedor de banderas!</h2><p>Puntaje: ${score} / ${shuffled.length}</p><button class="game-btn" onclick="gameRenderers['banderas'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
-      return;
-    }
-    const item = shuffled[current];
-    const options = [
-      ...new Set([
-        item.country,
-        ...flags
-          .filter((f) => f.country !== item.country)
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 3)
-          .map((f) => f.country),
-      ]),
-    ].sort(() => Math.random() - 0.5);
-
-    area.innerHTML = `
-      <div class="quiz-container">
-        <p class="math-score">Puntaje: ${score} / ${shuffled.length} &nbsp;|&nbsp; Pregunta ${current + 1}</p>
-        <div style="font-size:5rem;margin-bottom:16px;">${item.flag}</div>
-        <p class="quiz-question">¿De qué país es esta bandera?</p>
-        <div class="multi-options">${options.map((o) => `<button class="option-btn" data-val="${o}">${o}</button>`).join("")}</div>
-        <p id="flag-fb" class="math-feedback"></p>
-      </div>`;
-
-    area.querySelector(".multi-options").addEventListener("click", (e) => {
-      const btn = e.target.closest(".option-btn");
-      if (!btn) return;
-      const fb = document.getElementById("flag-fb");
-      if (btn.dataset.val === item.country) {
-        score++;
-        btn.style.background = "#2ecc71";
-        fb.textContent = "✅ ¡Correcto!";
-        fb.style.color = "#2ecc71";
-      } else {
-        btn.style.background = "#e74c3c";
-        fb.textContent = `❌ Era: ${item.country}`;
-        fb.style.color = "#e74c3c";
-      }
-      area.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
-      current++;
-      setTimeout(render, 1000);
-    });
-  }
-  render();
-};
-
-// ── Historia Divertida ───────────────────────────────────────────────────────
-gameRenderers["historia"] = function (area) {
+// ── Mi Identidad y Mi Familia ────────────────────────────────────────────────
+gameRenderers["identidad-familiar"] = function (area) {
   const questions = [
+    // Identidad personal y familiar
     {
-      q: "¿Quién llegó a América en 1492?",
-      options: ["Cristóbal Colón", "Hernán Cortés", "Simón Bolívar", "Napoleón"],
-      answer: "Cristóbal Colón",
+      category: "👨‍👩‍👧 Mi Familia",
+      q: "¿Quiénes forman una familia?",
+      options: [
+        "Solo padres e hijos",
+        "Personas que se quieren y cuidan entre sí",
+        "Solo personas del mismo apellido",
+        "Solo quienes viven juntos",
+      ],
+      answer: "Personas que se quieren y cuidan entre sí",
+      fact: "Una familia se forma por el amor y el cuidado mutuo, sin importar su forma.",
     },
     {
-      q: "¿Qué civilización construyó las pirámides de Egipto?",
-      options: ["Egipcios", "Romanos", "Mayas", "Griegos"],
-      answer: "Egipcios",
+      category: "👨‍👩‍👧 Mi Familia",
+      q: "¿Cómo se llaman los padres de tus padres?",
+      options: ["Tíos", "Primos", "Abuelos", "Padrinos"],
+      answer: "Abuelos",
+      fact: "Los abuelos son los padres de nuestros padres y guardan la memoria de la familia.",
     },
     {
-      q: "¿En qué continente vivían los dinosaurios?",
-      options: ["En todos", "Solo América", "Solo África", "Solo Asia"],
-      answer: "En todos",
+      category: "🪪 Mi Identidad",
+      q: "¿Cuál de estos datos hace parte de tu identidad personal?",
+      options: ["Tu nombre y apellido", "El nombre de tu vecino", "El color del cielo", "El nombre de tu mascota"],
+      answer: "Tu nombre y apellido",
+      fact: "Tu nombre, apellido y fecha de nacimiento son datos que te identifican como persona única.",
     },
     {
-      q: "¿Qué invento cambió la comunicación escrita?",
-      options: ["La imprenta", "El teléfono", "La rueda", "El fuego"],
-      answer: "La imprenta",
+      category: "🪪 Mi Identidad",
+      q: "¿Dónde se registra nuestra identidad oficial?",
+      options: [
+        "En el cuaderno",
+        "En el registro civil o tarjeta de identidad",
+        "En la agenda",
+        "En el álbum de fotos",
+      ],
+      answer: "En el registro civil o tarjeta de identidad",
+      fact: "El registro civil es el documento oficial que confirma nuestra identidad desde el nacimiento.",
+    },
+    // Reconocimiento del territorio
+    {
+      category: "🗺️ Mi Territorio",
+      q: "¿Qué es una vereda?",
+      options: [
+        "Una ciudad grande",
+        "Una comunidad rural con familias y tierras",
+        "Un barrio de la ciudad",
+        "Una isla en el mar",
+      ],
+      answer: "Una comunidad rural con familias y tierras",
+      fact: "La vereda es el lugar donde vive nuestra comunidad campesina, con sus campos y familias.",
     },
     {
-      q: "¿Quién pintó la Mona Lisa?",
-      options: ["Leonardo da Vinci", "Pablo Picasso", "Miguel Ángel", "Van Gogh"],
-      answer: "Leonardo da Vinci",
+      category: "🗺️ Mi Territorio",
+      q: "¿Cuál de estos hace parte del territorio de una vereda?",
+      options: [
+        "Rascacielos y metros",
+        "Ríos, montañas, cultivos y caminos",
+        "Playas y arrecifes",
+        "Desiertos y dunas",
+      ],
+      answer: "Ríos, montañas, cultivos y caminos",
+      fact: "El territorio de una vereda incluye la naturaleza, los cultivos y los caminos que unen a las familias.",
     },
     {
-      q: "¿Cuál fue la primera civilización de América?",
-      options: ["Olmeca", "Azteca", "Inca", "Maya"],
-      answer: "Olmeca",
+      category: "🗺️ Mi Territorio",
+      q: "¿Por qué es importante conocer nuestro territorio?",
+      options: [
+        "Para presumir con amigos",
+        "Para cuidarlo, protegerlo y sentirnos parte de él",
+        "Porque nos lo pide el profesor",
+        "Para dibujarlo en el cuaderno",
+      ],
+      answer: "Para cuidarlo, protegerlo y sentirnos parte de él",
+      fact: "Conocer nuestro territorio nos da identidad y nos inspira a cuidarlo para las futuras generaciones.",
+    },
+    // Normas de convivencia
+    {
+      category: "🤝 Convivencia",
+      q: "¿Qué son las normas de convivencia?",
+      options: [
+        "Castigos para los niños",
+        "Reglas que nos ayudan a vivir bien juntos",
+        "Leyes del gobierno nacional",
+        "Órdenes del alcalde",
+      ],
+      answer: "Reglas que nos ayudan a vivir bien juntos",
+      fact: "Las normas de convivencia son acuerdos comunitarios para vivir en paz y armonía.",
+    },
+    {
+      category: "🤝 Convivencia",
+      q: "¿Cuál es una norma de convivencia en la escuela?",
+      options: [
+        "Gritar en clase",
+        "Tirar basura al suelo",
+        "Respetar el turno para hablar",
+        "Ignorar a los compañeros",
+      ],
+      answer: "Respetar el turno para hablar",
+      fact: "Escuchar y respetar a los demás es fundamental para una buena convivencia.",
+    },
+    {
+      category: "🤝 Convivencia",
+      q: "¿Qué haces si ves que un compañero necesita ayuda?",
+      options: ["Lo ignoro", "Me río de él", "Lo ayudo con solidaridad", "Lo dejo solo"],
+      answer: "Lo ayudo con solidaridad",
+      fact: "La solidaridad y el compañerismo son las mejores normas de convivencia en comunidad.",
     },
   ];
 
+  const shuffled = shuffle([...questions]);
   let current = 0,
     score = 0;
 
   function render() {
-    if (current >= questions.length) {
-      area.innerHTML = `<div class="game-result"><h2>🎉 ¡Gran historiador!</h2><p>Puntaje: ${score} / ${questions.length}</p><button class="game-btn" onclick="gameRenderers['historia'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
+    if (current >= shuffled.length) {
+      const pct = Math.round((score / shuffled.length) * 100);
+      const stars = "⭐".repeat(Math.min(5, Math.ceil(pct / 20)));
+      area.innerHTML = `
+        <div class="game-result fadeIn">
+          <div style="font-size:3.5rem;">🌍</div>
+          <h2>¡Muy bien, ciudadano!</h2>
+          <p>Puntaje: <strong>${score}</strong> de <strong>${shuffled.length}</strong> (${pct}%)</p>
+          <div style="font-size:2rem;margin:8px 0;">${stars}</div>
+          <button class="game-btn" onclick="gameRenderers['identidad-familiar'](this.closest('.game-area'))">Jugar de nuevo</button>
+        </div>`;
+      narrateText(`¡Felicidades! Obtuviste ${score} de ${shuffled.length} respuestas correctas.`);
       return;
     }
-    const q = questions[current];
+    const q = shuffled[current];
+    const opts = shuffle([...q.options]);
     area.innerHTML = `
-      <div class="quiz-container">
-        <p class="math-score">Puntaje: ${score} / ${questions.length} &nbsp;|&nbsp; Pregunta ${current + 1}</p>
+      <div class="quiz-container fadeIn">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:6px;">
+          <span class="fono-badge">${q.category}</span>
+          <span class="math-score">Puntaje: ${score} | Pregunta ${current + 1}/${shuffled.length}</span>
+        </div>
         <p class="quiz-question">${q.q}</p>
-        <div class="multi-options">${q.options.map((o) => `<button class="option-btn" data-val="${o}">${o}</button>`).join("")}</div>
-        <p id="hist-fb" class="math-feedback"></p>
+        <div class="multi-options">
+          ${opts.map((o) => `<button class="option-btn" data-val="${o}">${o}</button>`).join("")}
+        </div>
+        <p id="id-fb" class="math-feedback" style="min-height:44px;margin-top:10px;font-size:0.95rem;"></p>
       </div>`;
+
+    narrateText(q.q);
 
     area.querySelector(".multi-options").addEventListener("click", (e) => {
       const btn = e.target.closest(".option-btn");
       if (!btn) return;
-      const fb = document.getElementById("hist-fb");
+      area.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
+      const fb = document.getElementById("id-fb");
       if (btn.dataset.val === q.answer) {
         score++;
         btn.style.background = "#2ecc71";
-        fb.textContent = "✅ ¡Correcto!";
-        fb.style.color = "#2ecc71";
+        fb.innerHTML = `✅ ¡Correcto! <em>${q.fact}</em>`;
+        fb.style.color = "#27ae60";
+        narrateText("¡Correcto! " + q.fact);
       } else {
         btn.style.background = "#e74c3c";
-        fb.textContent = `❌ Era: ${q.answer}`;
-        fb.style.color = "#e74c3c";
+        area.querySelectorAll(".option-btn").forEach((b) => {
+          if (b.dataset.val === q.answer) b.style.background = "#2ecc71";
+        });
+        fb.innerHTML = `❌ La respuesta es: <strong>${q.answer}</strong>. <em>${q.fact}</em>`;
+        fb.style.color = "#c0392b";
+        narrateText("La respuesta correcta es: " + q.answer + ". " + q.fact);
       }
-      area.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
       current++;
-      setTimeout(render, 1000);
+      setTimeout(render, 3200);
     });
   }
   render();
 };
 
+// ── Galería del Territorio y Audiorelato ─────────────────────────────────────
+gameRenderers["galeria-territorio"] = function (area) {
+  const places = [
+    {
+      icon: "🏫",
+      name: "La Escuela",
+      relato:
+        "En nuestra vereda, la escuela es el corazón de la comunidad. Aquí aprendemos a leer, a contar y a conocer el mundo. Los niños llegan caminando por los caminos de tierra, con sus mochilas llenas de sueños y esperanzas.",
+    },
+    {
+      icon: "🌊",
+      name: "El Río",
+      relato:
+        "El río es la vida de nuestra vereda. Sus aguas frescas bajan de las montañas y riegan nuestros cultivos. Los abuelos dicen que el río tiene memoria y guarda los secretos más profundos de nuestra tierra.",
+    },
+    {
+      icon: "⛰️",
+      name: "La Montaña",
+      relato:
+        "Desde la cima de nuestra montaña se puede ver todo el territorio. Las nubes la abrazan por las mañanas y los pájaros cantan entre sus árboles. La montaña nos da agua limpia, madera y plantas medicinales.",
+    },
+    {
+      icon: "🌾",
+      name: "Los Cultivos",
+      relato:
+        "Las familias cultivan maíz, frijol, café y caña con mucho esfuerzo y amor por la tierra. La cosecha es un momento de alegría donde toda la comunidad se ayuda en minga para recoger los frutos.",
+    },
+    {
+      icon: "⛪",
+      name: "La Capilla",
+      relato:
+        "La capilla es el lugar de encuentro de la comunidad. Aquí se celebran las fiestas patronales, las bodas y los bautizos. Es un espacio de fe y de unión donde todas las familias se reúnen.",
+    },
+    {
+      icon: "🛤️",
+      name: "El Camino Real",
+      relato:
+        "El camino real une nuestra vereda con el pueblo. Por él transitan personas, mulas cargadas de cosecha y niños que van a la escuela. Es la vía que nos conecta con el mundo y con otras comunidades.",
+    },
+    {
+      icon: "🏘️",
+      name: "Las Casas de la Comunidad",
+      relato:
+        "Las casas de nuestra vereda están construidas con materiales de la región: adobe, madera y teja de barro. Cada hogar guarda historias de familias que han vivido en este territorio por muchas generaciones.",
+    },
+    {
+      icon: "🌿",
+      name: "El Bosque Nativo",
+      relato:
+        "El bosque nativo es el pulmón de nuestra vereda. En él viven animales como el cóndor, el oso de anteojos y la danta. Los sabedores de la comunidad conocen sus plantas medicinales y sus secretos ancestrales.",
+    },
+  ];
+
+  let current = 0;
+
+  function render() {
+    const place = places[current];
+    area.innerHTML = `
+      <div class="galeria-container fadeIn">
+        <div class="galeria-card">
+          <div class="galeria-icon bounce">${place.icon}</div>
+          <h2 class="galeria-title">${place.name}</h2>
+          <div class="galeria-relato">
+            <p>${place.relato}</p>
+          </div>
+          <button class="galeria-audio-btn" id="gal-audio">🔊 Escuchar Audiorelato</button>
+        </div>
+        <div class="galeria-nav">
+          <button class="game-btn" id="gal-prev" ${current === 0 ? "disabled style='opacity:0.4;cursor:default;'" : ""}>◀ Anterior</button>
+          <span class="math-score">${current + 1} / ${places.length}</span>
+          <button class="game-btn" id="gal-next" ${current === places.length - 1 ? "disabled style='opacity:0.4;cursor:default;'" : ""}>Siguiente ▶</button>
+        </div>
+        <div class="galeria-dots">
+          ${places.map((_, i) => `<span class="galeria-dot${i === current ? " active" : ""}"></span>`).join("")}
+        </div>
+      </div>`;
+
+    document.getElementById("gal-audio").addEventListener("click", () => {
+      narrateText(place.name + ". " + place.relato);
+    });
+    document.getElementById("gal-prev").addEventListener("click", () => {
+      if (current > 0) {
+        current--;
+        render();
+      }
+    });
+    document.getElementById("gal-next").addEventListener("click", () => {
+      if (current < places.length - 1) {
+        current++;
+        render();
+      }
+    });
+
+    setTimeout(() => narrateText(place.name + ". " + place.relato), 400);
+  }
+  render();
+};
+
+// ── Completa el Mapa de mi Vereda e Historia de mi Familia ───────────────────
+gameRenderers["mapa-vereda"] = function (area) {
+  // ── Phase 1: Mapa de mi Vereda ────────────────────────────────────────────
+  function renderMapa() {
+    const zones = [
+      { id: "escuela", icon: "🏫", label: "La Escuela", hint: "Aquí aprendemos" },
+      { id: "rio", icon: "🌊", label: "El Río", hint: "Agua que baja de la montaña" },
+      { id: "montanas", icon: "⛰️", label: "Las Montañas", hint: "Lo más alto del territorio" },
+      { id: "cultivos", icon: "🌾", label: "Los Cultivos", hint: "Maíz, frijol y café" },
+      { id: "capilla", icon: "⛪", label: "La Capilla", hint: "Lugar de reunión y fe" },
+      { id: "camino", icon: "🛤️", label: "El Camino Real", hint: "Nos une con el pueblo" },
+    ];
+
+    const shuffledLabels = shuffle(zones.map((z) => ({ id: z.id, label: z.label })));
+    const answers = {};
+
+    area.innerHTML = `
+      <div class="mapa-container fadeIn">
+        <h3 class="mapa-title">🗺️ Completa el Mapa de Mi Vereda</h3>
+        <p class="mapa-subtitle">Arrastra cada nombre al lugar correcto del mapa</p>
+        <div class="mapa-grid" id="mapa-grid">
+          ${zones
+            .map(
+              (z) => `
+            <div class="mapa-zone" id="zone-${z.id}" data-id="${z.id}">
+              <div class="mapa-zone-icon">${z.icon}</div>
+              <div class="mapa-zone-hint">${z.hint}</div>
+              <div class="mapa-zone-drop" id="drop-${z.id}" data-id="${z.id}">
+                <span class="mapa-drop-placeholder">Arrastra aquí</span>
+              </div>
+            </div>`,
+            )
+            .join("")}
+        </div>
+        <div class="mapa-labels" id="mapa-labels">
+          ${shuffledLabels.map((l) => `<div class="mapa-label-chip" draggable="true" data-id="${l.id}" id="chip-${l.id}">${l.label}</div>`).join("")}
+        </div>
+        <div style="text-align:center;margin-top:14px;">
+          <button class="game-btn" id="mapa-check">✅ Comprobar</button>
+          <button class="game-btn" id="mapa-reset" style="background:#95a5a6;margin-left:8px;">🔄 Reiniciar</button>
+        </div>
+        <p id="mapa-fb" class="math-feedback" style="text-align:center;margin-top:10px;min-height:32px;"></p>
+      </div>`;
+
+    let dragging = null;
+
+    document.querySelectorAll(".mapa-label-chip").forEach((chip) => {
+      chip.addEventListener("dragstart", () => {
+        dragging = chip;
+        chip.style.opacity = "0.5";
+      });
+      chip.addEventListener("dragend", () => {
+        if (dragging) dragging.style.opacity = "1";
+        dragging = null;
+      });
+    });
+
+    document.querySelectorAll(".mapa-zone-drop").forEach((drop) => {
+      drop.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        drop.classList.add("drag-over");
+      });
+      drop.addEventListener("dragleave", () => drop.classList.remove("drag-over"));
+      drop.addEventListener("drop", (e) => {
+        e.preventDefault();
+        drop.classList.remove("drag-over");
+        if (!dragging) return;
+        const zoneId = drop.dataset.id;
+        const chipId = dragging.dataset.id;
+        // Return old chip to the tray if zone was already occupied
+        const prevId = answers[zoneId];
+        if (prevId) {
+          const prevChip = document.getElementById(`chip-${prevId}`);
+          if (prevChip) {
+            prevChip.style.display = "";
+            document.getElementById("mapa-labels").appendChild(prevChip);
+          }
+        }
+        answers[zoneId] = chipId;
+        drop.innerHTML = `<span class="mapa-drop-placed">${dragging.textContent}</span>`;
+        dragging.style.display = "none";
+        dragging.style.opacity = "1";
+      });
+    });
+
+    document.getElementById("mapa-check").addEventListener("click", () => {
+      const fb = document.getElementById("mapa-fb");
+      let correct = 0;
+      zones.forEach((z) => {
+        const zoneEl = document.getElementById(`zone-${z.id}`);
+        if (answers[z.id] === z.id) {
+          correct++;
+          zoneEl.style.background = "#d5f5e3";
+          zoneEl.style.borderColor = "#2ecc71";
+        } else if (answers[z.id]) {
+          zoneEl.style.background = "#fdecea";
+          zoneEl.style.borderColor = "#e74c3c";
+        }
+      });
+      if (correct === zones.length) {
+        fb.textContent = "✅ ¡Perfecto! Conoces muy bien tu vereda.";
+        fb.style.color = "#27ae60";
+        narrateText("¡Perfecto! Conoces muy bien tu vereda. Ahora cuéntanos la historia de tu familia.");
+        setTimeout(renderFamilia, 2800);
+      } else {
+        fb.textContent = `${correct} de ${zones.length} correctos. ¡Intenta de nuevo!`;
+        fb.style.color = "#e74c3c";
+        narrateText(`Tienes ${correct} de ${zones.length} correctos. Sigue intentando.`);
+      }
+    });
+
+    document.getElementById("mapa-reset").addEventListener("click", () => renderMapa());
+  }
+
+  // ── Phase 2: Historia de mi Familia ──────────────────────────────────────
+  function renderFamilia() {
+    area.innerHTML = `
+      <div class="familia-container fadeIn">
+        <h3 class="mapa-title">👨‍👩‍👧 Historia de Mi Familia</h3>
+        <p class="mapa-subtitle">Escribe el nombre de cada miembro de tu familia</p>
+        <div class="arbol-familiar">
+
+          <div class="arbol-row">
+            <div class="arbol-level-label">👴👵 Abuelos Paternos</div>
+            <div class="arbol-nodes">
+              <div class="arbol-node">
+                <div class="arbol-icon">👴</div>
+                <input class="arbol-input" placeholder="Nombre del abuelo" data-rel="Abuelo paterno" />
+              </div>
+              <div class="arbol-node">
+                <div class="arbol-icon">👵</div>
+                <input class="arbol-input" placeholder="Nombre de la abuela" data-rel="Abuela paterna" />
+              </div>
+            </div>
+          </div>
+
+          <div class="arbol-row">
+            <div class="arbol-level-label">👴👵 Abuelos Maternos</div>
+            <div class="arbol-nodes">
+              <div class="arbol-node">
+                <div class="arbol-icon">👴</div>
+                <input class="arbol-input" placeholder="Nombre del abuelo" data-rel="Abuelo materno" />
+              </div>
+              <div class="arbol-node">
+                <div class="arbol-icon">👵</div>
+                <input class="arbol-input" placeholder="Nombre de la abuela" data-rel="Abuela materna" />
+              </div>
+            </div>
+          </div>
+
+          <div class="arbol-row">
+            <div class="arbol-level-label">👨👩 Mis Padres</div>
+            <div class="arbol-nodes">
+              <div class="arbol-node">
+                <div class="arbol-icon">👨</div>
+                <input class="arbol-input" placeholder="Nombre de tu papá" data-rel="Papá" />
+              </div>
+              <div class="arbol-node">
+                <div class="arbol-icon">👩</div>
+                <input class="arbol-input" placeholder="Nombre de tu mamá" data-rel="Mamá" />
+              </div>
+            </div>
+          </div>
+
+          <div class="arbol-row">
+            <div class="arbol-level-label">🧒 Yo y Mis Hermanos</div>
+            <div class="arbol-nodes">
+              <div class="arbol-node arbol-yo">
+                <div class="arbol-icon">🧒</div>
+                <input class="arbol-input" placeholder="Tu nombre" data-rel="Yo" />
+              </div>
+              <div class="arbol-node">
+                <div class="arbol-icon">👦</div>
+                <input class="arbol-input" placeholder="Hermano/a 1" data-rel="Hermano/a 1" />
+              </div>
+              <div class="arbol-node">
+                <div class="arbol-icon">👧</div>
+                <input class="arbol-input" placeholder="Hermano/a 2" data-rel="Hermano/a 2" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button class="game-btn" id="fam-guardar">💾 Guardar mi Historia</button>
+          <button class="game-btn" id="fam-narrar" style="background:#9b59b6;">🔊 Narrar mi Historia</button>
+          <button class="game-btn" id="fam-mapa" style="background:#27ae60;">🗺️ Volver al Mapa</button>
+        </div>
+        <div id="fam-historia" class="fam-historia-box" style="display:none;"></div>
+      </div>`;
+
+    document.getElementById("fam-mapa").addEventListener("click", () => renderMapa());
+
+    document.getElementById("fam-guardar").addEventListener("click", () => {
+      const inputs = area.querySelectorAll(".arbol-input");
+      const members = [];
+      inputs.forEach((inp) => {
+        if (inp.value.trim()) members.push({ rel: inp.dataset.rel, name: inp.value.trim() });
+      });
+      if (members.length === 0) {
+        narrateText("Por favor, escribe el nombre de al menos un familiar.");
+        return;
+      }
+      const histBox = document.getElementById("fam-historia");
+      histBox.style.display = "block";
+      histBox.innerHTML = `
+        <h4>📖 La Historia de Mi Familia</h4>
+        <p>${members.map((m) => `<strong>${m.rel}:</strong> ${m.name}`).join(" &nbsp;|&nbsp; ")}</p>
+        <p style="margin-top:8px;font-style:italic;color:#7f8c8d;">
+          Mi familia vive en nuestra vereda con amor y esfuerzo. Cada miembro tiene un papel importante en nuestra historia.
+        </p>`;
+      narrateText("¡Guardaste la historia de tu familia! Qué bonita familia tienes.");
+    });
+
+    document.getElementById("fam-narrar").addEventListener("click", () => {
+      const inputs = area.querySelectorAll(".arbol-input");
+      const members = [];
+      inputs.forEach((inp) => {
+        if (inp.value.trim()) members.push(`${inp.dataset.rel}: ${inp.value.trim()}`);
+      });
+      if (members.length === 0) {
+        narrateText("Escribe primero los nombres de tu familia para narrar la historia.");
+        return;
+      }
+      narrateText(
+        "Esta es la historia de mi familia. " +
+          members.join(". ") +
+          ". Mi familia vive en nuestra vereda con amor y esfuerzo.",
+      );
+    });
+  }
+
+  renderMapa();
+};
+
 // ╔══════════════════════════════════════════════════════════════════╗
-// ║  EDUCACIÓN ARTÍSTICA                                            ║
+// ║  EDUCACIÓN ARTÍSTICA — v2                                        ║
 // ╚══════════════════════════════════════════════════════════════════╝
 
-// ── Colorear ─────────────────────────────────────────────────────────────────
-gameRenderers["colorear"] = function (area) {
+// ── Utilidad de audio compartida (Web Audio API) ─────────────────────────────
+function artAudio() {
+  if (!globalThis._artCtx) {
+    // eslint-disable-next-line no-undef
+    const Ctx = globalThis.AudioContext || globalThis.webkitAudioContext;
+    globalThis._artCtx = new Ctx();
+  }
+  return globalThis._artCtx;
+}
+
+function artBeep(freq = 440, dur = 0.18, type = "sine", vol = 0.4, delay = 0) {
+  const ctx = artAudio();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.frequency.value = freq;
+  osc.type = type;
+  const t = ctx.currentTime + delay;
+  gain.gain.setValueAtTime(vol, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  osc.start(t);
+  osc.stop(t + dur + 0.05);
+}
+
+// ── 1. Expresión Plástica Libre ───────────────────────────────────────────────
+gameRenderers["expresion-plastica"] = function (area) {
   const colors = [
+    "#2d3436",
     "#e74c3c",
     "#e67e22",
     "#f1c40f",
@@ -1659,171 +1990,1067 @@ gameRenderers["colorear"] = function (area) {
     "#1abc9c",
     "#e84393",
     "#ffffff",
-    "#2d3436",
+    "#f39c12",
+    "#27ae60",
+    "#2980b9",
+    "#8e44ad",
+    "#d35400",
+  ];
+  const stamps = [
+    { icon: "🦅", label: "Cóndor" },
+    { icon: "🌺", label: "Orquídea" },
+    { icon: "🎋", label: "Guadua" },
+    { icon: "🦜", label: "Guacamaya" },
+    { icon: "🦋", label: "Mariposa" },
+    { icon: "🎭", label: "Teatro" },
+    { icon: "🥁", label: "Tambora" },
+    { icon: "🌿", label: "Helecho" },
+    { icon: "⭐", label: "Estrella" },
+    { icon: "❤️", label: "Corazón" },
   ];
   let currentColor = colors[0];
-
-  // Dibujo simple: cuadrícula para colorear
-  const ROWS = 12,
-    COLS = 16;
-
-  area.innerHTML = `
-    <div class="colorear-container">
-      <div class="color-palette" id="color-palette">
-        ${colors.map((c) => `<button class="color-swatch${c === currentColor ? " active" : ""}" data-color="${c}" style="background:${c};width:32px;height:32px;border-radius:50%;border:3px solid ${c === currentColor ? "#333" : "transparent"};cursor:pointer;"></button>`).join("")}
-      </div>
-      <div class="colorear-grid" id="colorear-grid" style="display:grid;grid-template-columns:repeat(${COLS},28px);gap:1px;margin-top:12px;"></div>
-    </div>`;
-
-  const gridEl = document.getElementById("colorear-grid");
-  for (let i = 0; i < ROWS * COLS; i++) {
-    const cell = document.createElement("div");
-    cell.style.cssText = "width:28px;height:28px;background:#f5f5f5;border:1px solid #ddd;cursor:pointer;";
-    cell.className = "colorear-cell";
-    gridEl.appendChild(cell);
-  }
-
-  let painting = false;
-
-  document.getElementById("color-palette").addEventListener("click", (e) => {
-    const swatch = e.target.closest(".color-swatch");
-    if (!swatch) return;
-    currentColor = swatch.dataset.color;
-    document.querySelectorAll(".color-swatch").forEach((s) => {
-      s.style.borderColor = "transparent";
-    });
-    swatch.style.borderColor = "#333";
-  });
-
-  gridEl.addEventListener("mousedown", (e) => {
-    painting = true;
-    const cell = e.target.closest(".colorear-cell");
-    if (cell) cell.style.background = currentColor;
-  });
-  gridEl.addEventListener("mouseover", (e) => {
-    if (!painting) return;
-    const cell = e.target.closest(".colorear-cell");
-    if (cell) cell.style.background = currentColor;
-  });
-  gridEl.addEventListener("mouseup", () => (painting = false));
-  gridEl.addEventListener("mouseleave", () => (painting = false));
-};
-
-// ── Instrumentos Musicales ───────────────────────────────────────────────────
-gameRenderers["instrumentos"] = function (area) {
-  const instruments = [
-    { name: "Piano", emoji: "🎹", family: "Teclado", desc: "Tiene teclas blancas y negras" },
-    { name: "Guitarra", emoji: "🎸", family: "Cuerda", desc: "Tiene 6 cuerdas y se rasguea" },
-    { name: "Batería", emoji: "🥁", family: "Percusión", desc: "Se toca con baquetas" },
-    { name: "Violín", emoji: "🎻", family: "Cuerda", desc: "Se toca con un arco" },
-    { name: "Trompeta", emoji: "🎺", family: "Viento metal", desc: "Instrumento de viento con pistones" },
-    { name: "Flauta", emoji: "🪈", family: "Viento madera", desc: "Se sopla por un orificio lateral" },
-    { name: "Saxofón", emoji: "🎷", family: "Viento madera", desc: "Muy popular en el jazz" },
-    { name: "Maracas", emoji: "🪇", family: "Percusión", desc: "Se agitan para producir sonido" },
-  ];
-
-  let current = 0,
-    score = 0;
-  const shuffled = [...instruments].sort(() => Math.random() - 0.5);
-
-  function render() {
-    if (current >= shuffled.length) {
-      area.innerHTML = `<div class="game-result"><h2>🎉 ¡Gran músico!</h2><p>Puntaje: ${score} / ${shuffled.length}</p><button class="game-btn" onclick="gameRenderers['instrumentos'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
-      return;
-    }
-    const inst = shuffled[current];
-    const options = [
-      ...new Set([
-        inst.name,
-        ...instruments
-          .filter((i) => i.name !== inst.name)
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 3)
-          .map((i) => i.name),
-      ]),
-    ].sort(() => Math.random() - 0.5);
-
-    area.innerHTML = `
-      <div class="quiz-container">
-        <p class="math-score">Puntaje: ${score} / ${shuffled.length} &nbsp;|&nbsp; Instrumento ${current + 1}</p>
-        <div style="font-size:4rem;margin-bottom:8px;">${inst.emoji}</div>
-        <p style="color:#888;margin-bottom:4px;">Familia: ${inst.family}</p>
-        <p class="quiz-question">${inst.desc}</p>
-        <div class="multi-options">${options.map((o) => `<button class="option-btn" data-val="${o}">${o}</button>`).join("")}</div>
-        <p id="inst-fb" class="math-feedback"></p>
-      </div>`;
-
-    area.querySelector(".multi-options").addEventListener("click", (e) => {
-      const btn = e.target.closest(".option-btn");
-      if (!btn) return;
-      const fb = document.getElementById("inst-fb");
-      if (btn.dataset.val === inst.name) {
-        score++;
-        btn.style.background = "#2ecc71";
-        fb.textContent = "✅ ¡Correcto!";
-        fb.style.color = "#2ecc71";
-      } else {
-        btn.style.background = "#e74c3c";
-        fb.textContent = `❌ Era: ${inst.name}`;
-        fb.style.color = "#e74c3c";
-      }
-      area.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
-      current++;
-      setTimeout(render, 1000);
-    });
-  }
-  render();
-};
-
-// ── Dibujo Libre ─────────────────────────────────────────────────────────────
-gameRenderers["dibujo-libre"] = function (area) {
-  const colors = ["#2d3436", "#e74c3c", "#e67e22", "#f1c40f", "#2ecc71", "#3498db", "#9b59b6", "#e84393", "#ffffff"];
-  let currentColor = colors[0];
-  let brushSize = 4;
+  let brushSize = 6;
   let drawing = false;
+  let tool = "brush";
+  let currentStamp = stamps[0];
 
   area.innerHTML = `
-    <div class="dibujo-container">
-      <div class="dibujo-toolbar" style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-        <div id="dibujo-palette" style="display:flex;gap:4px;">
-          ${colors.map((c) => `<button class="color-swatch${c === currentColor ? " active" : ""}" data-color="${c}" style="background:${c};width:28px;height:28px;border-radius:50%;border:3px solid ${c === currentColor ? "#333" : "#ccc"};cursor:pointer;"></button>`).join("")}
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:#fff;padding:8px;border-radius:12px;border:1px solid #eee;">
+        <div id="arte-palette" style="display:flex;gap:3px;flex-wrap:wrap;">
+          ${colors.map((c, i) => `<button class="arte-swatch" data-color="${c}" style="width:24px;height:24px;background:${c};border-radius:50%;border:2px solid ${i === 0 ? "#333" : "#ccc"};cursor:pointer;flex-shrink:0;"></button>`).join("")}
         </div>
-        <label style="font-size:0.85rem;">Grosor: <input type="range" id="brush-size" min="1" max="20" value="${brushSize}" style="width:80px;"></label>
-        <button id="clear-canvas" class="game-btn" style="padding:6px 14px;font-size:0.85rem;">Limpiar</button>
+        <div style="display:flex;gap:4px;margin-left:6px;">
+          <button id="arte-pincel" class="game-btn" style="padding:4px 10px;font-size:0.8rem;">🖌️ Pincel</button>
+          <button id="arte-borrador" class="game-btn" style="padding:4px 10px;font-size:0.8rem;background:#95a5a6;">⬜ Borrar</button>
+        </div>
+        <label style="font-size:0.8rem;white-space:nowrap;">Grosor:<input type="range" id="arte-sz" min="2" max="24" value="${brushSize}" style="width:70px;vertical-align:middle;margin-left:4px;"></label>
+        <button id="arte-clear" class="game-btn" style="padding:4px 10px;font-size:0.8rem;background:#e74c3c;">🗑️ Limpiar</button>
       </div>
-      <canvas id="dibujo-canvas" width="600" height="350" style="background:#fff;border-radius:12px;border:1px solid #ddd;cursor:crosshair;display:block;"></canvas>
+      <div id="arte-stamps" style="display:flex;gap:4px;flex-wrap:wrap;background:#fff;padding:6px 10px;border-radius:12px;border:1px solid #eee;align-items:center;">
+        <span style="font-size:0.8rem;font-weight:bold;color:#555;margin-right:4px;">Sellos:</span>
+        ${stamps.map((s) => `<button class="arte-stamp-btn" data-icon="${s.icon}" title="${s.label}" style="font-size:1.5rem;background:none;border:2px solid transparent;border-radius:8px;cursor:pointer;padding:1px 4px;line-height:1;">${s.icon}</button>`).join("")}
+      </div>
+      <canvas id="arte-canvas" width="640" height="320" style="background:#fff;border-radius:12px;border:2px solid #ddd;cursor:crosshair;display:block;max-width:100%;"></canvas>
+      <p style="font-size:0.78rem;color:#888;text-align:center;margin:0;">¡Exprésate libremente! Pinta, borra y usa sellos de la naturaleza y cultura caucana.</p>
     </div>`;
 
-  const canvas = document.getElementById("dibujo-canvas");
+  const canvas = document.getElementById("arte-canvas");
   const ctx = canvas.getContext("2d");
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
 
-  document.getElementById("dibujo-palette").addEventListener("click", (e) => {
-    const swatch = e.target.closest(".color-swatch");
-    if (!swatch) return;
-    currentColor = swatch.dataset.color;
-    document.querySelectorAll("#dibujo-palette .color-swatch").forEach((s) => (s.style.borderColor = "#ccc"));
-    swatch.style.borderColor = "#333";
+  document.getElementById("arte-palette").addEventListener("click", (e) => {
+    const btn = e.target.closest(".arte-swatch");
+    if (!btn) return;
+    currentColor = btn.dataset.color;
+    document.querySelectorAll(".arte-swatch").forEach((b) => (b.style.borderColor = "#ccc"));
+    btn.style.borderColor = "#333";
+    tool = "brush";
   });
 
-  document.getElementById("brush-size").addEventListener("input", (e) => (brushSize = e.target.value));
-  document
-    .getElementById("clear-canvas")
-    .addEventListener("click", () => ctx.clearRect(0, 0, canvas.width, canvas.height));
+  document.getElementById("arte-stamps").addEventListener("click", (e) => {
+    const btn = e.target.closest(".arte-stamp-btn");
+    if (!btn) return;
+    currentStamp = { icon: btn.dataset.icon };
+    document.querySelectorAll(".arte-stamp-btn").forEach((b) => (b.style.borderColor = "transparent"));
+    btn.style.borderColor = "#3498db";
+    tool = "stamp";
+  });
+
+  document.getElementById("arte-pincel").addEventListener("click", () => {
+    tool = "brush";
+  });
+  document.getElementById("arte-borrador").addEventListener("click", () => {
+    tool = "eraser";
+  });
+  document.getElementById("arte-sz").addEventListener("input", (e) => {
+    brushSize = Number.parseInt(e.target.value, 10);
+  });
+  document.getElementById("arte-clear").addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
 
   canvas.addEventListener("mousedown", (e) => {
+    if (tool === "stamp") {
+      const size = Math.max(24, brushSize * 3);
+      ctx.font = `${size}px serif`;
+      ctx.fillText(currentStamp.icon, e.offsetX - size / 2, e.offsetY + size / 3);
+      return;
+    }
     drawing = true;
     ctx.beginPath();
     ctx.moveTo(e.offsetX, e.offsetY);
   });
   canvas.addEventListener("mousemove", (e) => {
     if (!drawing) return;
-    ctx.strokeStyle = currentColor;
-    ctx.lineWidth = brushSize;
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.stroke();
+    if (tool === "eraser") {
+      ctx.clearRect(e.offsetX - brushSize, e.offsetY - brushSize, brushSize * 2, brushSize * 2);
+    } else {
+      ctx.strokeStyle = currentColor;
+      ctx.lineWidth = brushSize;
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+    }
   });
-  canvas.addEventListener("mouseup", () => (drawing = false));
-  canvas.addEventListener("mouseleave", () => (drawing = false));
+  canvas.addEventListener("mouseup", () => {
+    drawing = false;
+  });
+  canvas.addEventListener("mouseleave", () => {
+    drawing = false;
+  });
+};
+
+// ── 2. Reconocimiento del Ritmo ────────────────────────────────────────────────
+gameRenderers["ritmo-musical"] = function (area) {
+  const patterns = [
+    { name: "Bambuco (3/4)", beats: [1, 0, 0, 1, 0, 0], bpm: 90, freqs: [392, 294, 220] },
+    { name: "Cumbia (4/4)", beats: [1, 0, 1, 0, 1, 0, 1, 0], bpm: 100, freqs: [440, 330, 264] },
+    { name: "Currulao", beats: [1, 1, 0, 1, 0, 1], bpm: 110, freqs: [370, 277, 220] },
+    { name: "Chirimía", beats: [1, 0, 1, 1, 0, 1, 0, 0], bpm: 120, freqs: [494, 392, 294] },
+    { name: "Rajaleña", beats: [1, 0, 0, 1, 1, 0], bpm: 95, freqs: [415, 311, 233] },
+  ];
+  let level = 0,
+    score = 0;
+
+  function playPattern(pattern) {
+    const ms = 60000 / pattern.bpm / 2;
+    pattern.beats.forEach((beat, i) => {
+      if (!beat) return;
+      setTimeout(() => {
+        artBeep(pattern.freqs[i % pattern.freqs.length], 0.15, "triangle", 0.5);
+        const dots = document.querySelectorAll(".ritmo-dot");
+        if (dots[i]) {
+          dots[i].style.transform = "scale(1.3)";
+          dots[i].style.opacity = "1";
+          setTimeout(() => {
+            dots[i].style.transform = "";
+            dots[i].style.opacity = "0.5";
+          }, 150);
+        }
+      }, i * ms);
+    });
+  }
+
+  function render() {
+    if (level >= patterns.length) {
+      area.innerHTML = `
+        <div class="game-result fadeIn">
+          <div style="font-size:3rem;">🎵</div>
+          <h2>¡Felicidades, gran músico!</h2>
+          <p>Reconociste los ritmos del Cauca: Bambuco, Cumbia, Currulao, Chirimía y Rajaleña.</p>
+          <p><strong>Puntaje: ${score} / ${patterns.length}</strong></p>
+          <button class="game-btn" onclick="gameRenderers['ritmo-musical'](this.closest('.game-area'))">Jugar de nuevo</button>
+        </div>`;
+      return;
+    }
+    const pat = patterns[level];
+    const wrong = patterns
+      .filter((_, i) => i !== level)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 2);
+    const options = [...wrong, pat].sort(() => Math.random() - 0.5);
+
+    area.innerHTML = `
+      <div class="quiz-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">🎵 Ritmos del Cauca</span>
+          <span class="math-score">Nivel ${level + 1}/${patterns.length} | Puntaje: ${score}</span>
+        </div>
+        <p style="text-align:center;font-size:0.95rem;color:#555;margin:8px 0;">Escucha el patrón y elige a qué música del Cauca pertenece:</p>
+        <div style="display:flex;gap:8px;justify-content:center;margin:10px 0;flex-wrap:wrap;">
+          ${pat.beats.map((b) => `<div class="ritmo-dot" style="width:28px;height:28px;border-radius:50%;background:${b ? "#e74c3c" : "#ddd"};border:2px solid ${b ? "#c0392b" : "#bbb"};transition:all 0.12s;opacity:${b ? "0.7" : "0.4"};"></div>`).join("")}
+        </div>
+        <button id="ritmo-play" class="game-btn" style="display:block;margin:0 auto 14px;">▶️ Escuchar Ritmo</button>
+        <div class="multi-options" style="justify-content:center;">
+          ${options.map((o) => `<button class="option-btn ritmo-opt" data-val="${o.name}">${o.name}</button>`).join("")}
+        </div>
+        <p id="ritmo-fb" class="math-feedback"></p>
+      </div>`;
+
+    document.getElementById("ritmo-play").addEventListener("click", () => playPattern(pat));
+    setTimeout(() => playPattern(pat), 500);
+
+    area.querySelector(".multi-options").addEventListener("click", (e) => {
+      const btn = e.target.closest(".ritmo-opt");
+      if (!btn) return;
+      const fb = document.getElementById("ritmo-fb");
+      const correct = btn.dataset.val === pat.name;
+      if (correct) {
+        score++;
+        btn.style.background = "#2ecc71";
+        fb.textContent = `✅ ¡Correcto! Es ${pat.name}.`;
+        fb.style.color = "#2ecc71";
+        artBeep(523, 0.18, "sine", 0.5, 0);
+        artBeep(659, 0.18, "sine", 0.5, 0.2);
+        artBeep(784, 0.25, "sine", 0.5, 0.4);
+      } else {
+        btn.style.background = "#e74c3c";
+        fb.textContent = `❌ Era: ${pat.name}`;
+        fb.style.color = "#e74c3c";
+      }
+      area.querySelectorAll(".ritmo-opt").forEach((b) => (b.disabled = true));
+      level++;
+      setTimeout(render, 1800);
+    });
+  }
+  render();
+};
+
+// ── 3. Danza y Música del Cauca ────────────────────────────────────────────────
+gameRenderers["danza-cauca"] = function (area) {
+  const danzas = [
+    {
+      name: "Bambuco",
+      emoji: "🎻",
+      region: "Andes caucanos",
+      desc: "Danza nacional de Colombia, símbolo de identidad andina. Nació en los Andes del Cauca y Nariño. El hombre corteja a la mujer con movimientos elegantes usando el pañuelo.",
+      instrumentos: "Tiple, bandola, guitarra, flauta traversa",
+      caracter: "Romántico y vivaz",
+      quiz: "¿Qué instrumento es típico del Bambuco?",
+      opciones: ["Tiple", "Marimba de chonta", "Gaita", "Tambor alegre"],
+      correcta: "Tiple",
+    },
+    {
+      name: "Currulao",
+      emoji: "🥁",
+      region: "Pacífico caucano",
+      desc: "Expresión musical de las comunidades afrodescendientes del Pacífico sur. Declarado Patrimonio Cultural Inmaterial de la Humanidad por la UNESCO en 2010.",
+      instrumentos: "Marimba de chonta, cununos, bombos, shakers (guasa)",
+      caracter: "Sagrado y ceremonial",
+      quiz: "¿A qué comunidad pertenece el Currulao?",
+      opciones: [
+        "Comunidades afrodescendientes",
+        "Comunidades indígenas Nasa",
+        "Comunidades mestizas",
+        "Comunidades Misak",
+      ],
+      correcta: "Comunidades afrodescendientes",
+    },
+    {
+      name: "Chirimía",
+      emoji: "🎺",
+      region: "Norte del Cauca",
+      desc: "Música festiva de viento y percusión, propia de las comunidades afro del norte del Cauca. Se toca en fiestas, ferias y celebraciones populares de la región.",
+      instrumentos: "Clarinete, bombardino, platillos, caja y bombo",
+      caracter: "Festivo y alegre",
+      quiz: "¿En qué región del Cauca es popular la Chirimía?",
+      opciones: ["Norte del Cauca", "Sur del Cauca", "Tierradentro", "Sibundoy"],
+      correcta: "Norte del Cauca",
+    },
+    {
+      name: "Marimba de Chonta",
+      emoji: "🪘",
+      region: "Pacífico caucano",
+      desc: "Instrumento ancestral hecho de madera de chonta. Es el corazón de la música del litoral Pacífico y fue declarado Patrimonio de la Humanidad junto al Currulao.",
+      instrumentos: "Marimba, cununos, shakers, bombos",
+      caracter: "Ritual y festivo",
+      quiz: "¿De qué material se fabrica la Marimba de Chonta?",
+      opciones: ["Madera de chonta", "Bambú guadua", "Barro cocido", "Calabaza"],
+      correcta: "Madera de chonta",
+    },
+    {
+      name: "Rajaleña",
+      emoji: "🎶",
+      region: "Tierradentro, Cauca",
+      desc: "Música tradicional del interior caucano con coplas cantadas sobre el trabajo del campo. Se entona al ritmo de hachas y machetes durante las mingas y cosechas comunitarias.",
+      instrumentos: "Voz, chucho, rayadores y palmadas",
+      caracter: "Campesino y jocoso",
+      quiz: "¿En qué actividades se canta la Rajaleña?",
+      opciones: ["Mingas y cosechas", "Bodas y bautizos", "Funerales", "Competencias deportivas"],
+      correcta: "Mingas y cosechas",
+    },
+  ];
+
+  let current = 0,
+    score = 0;
+
+  function renderInfo() {
+    const d = danzas[current];
+    area.innerHTML = `
+      <div class="quiz-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">🎭 Danzas y Músicas del Cauca</span>
+          <span class="math-score">${current + 1} / ${danzas.length}</span>
+        </div>
+        <div style="text-align:center;padding:10px 0;">
+          <div style="font-size:3.5rem;">${d.emoji}</div>
+          <h2 style="margin:6px 0;color:#8e44ad;">${d.name}</h2>
+          <p style="font-size:0.85rem;color:#888;margin:0;">📍 ${d.region}</p>
+        </div>
+        <div style="background:#f8f9fa;border-radius:12px;padding:12px 16px;margin:8px 0;border-left:4px solid #9b59b6;">
+          <p style="margin:0 0 6px;font-size:0.9rem;">${d.desc}</p>
+          <p style="margin:0;font-size:0.85rem;"><strong>🎵 Instrumentos:</strong> ${d.instrumentos}</p>
+          <p style="margin:4px 0 0;font-size:0.85rem;"><strong>💃 Carácter:</strong> ${d.caracter}</p>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+          <button id="danza-narrar" class="game-btn" style="background:#9b59b6;">🔊 Escuchar</button>
+          <button id="danza-quiz" class="game-btn">Pregunta ➡️</button>
+        </div>
+      </div>`;
+    document.getElementById("danza-narrar").addEventListener("click", () => {
+      narrateText(`${d.name}. ${d.desc}. Sus instrumentos son: ${d.instrumentos}.`);
+    });
+    setTimeout(() => narrateText(`${d.name}. ${d.desc}`), 300);
+    document.getElementById("danza-quiz").addEventListener("click", () => {
+      renderQuiz();
+    });
+  }
+
+  function renderQuiz() {
+    const d = danzas[current];
+    area.innerHTML = `
+      <div class="quiz-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">🎭 ${d.name}</span>
+          <span class="math-score">Puntaje: ${score} | ${current + 1}/${danzas.length}</span>
+        </div>
+        <div style="text-align:center;font-size:2.5rem;margin:8px 0;">${d.emoji}</div>
+        <p class="quiz-question">${d.quiz}</p>
+        <div class="multi-options">
+          ${d.opciones.map((o) => `<button class="option-btn danza-opt" data-val="${o}">${o}</button>`).join("")}
+        </div>
+        <p id="danza-fb" class="math-feedback"></p>
+      </div>`;
+
+    area.querySelector(".multi-options").addEventListener("click", (e) => {
+      const btn = e.target.closest(".danza-opt");
+      if (!btn) return;
+      const fb = document.getElementById("danza-fb");
+      const correct = btn.dataset.val === d.correcta;
+      if (correct) {
+        score++;
+        btn.style.background = "#2ecc71";
+        fb.textContent = "✅ ¡Correcto!";
+        fb.style.color = "#2ecc71";
+        artBeep(523, 0.15, "sine", 0.4, 0);
+        artBeep(659, 0.15, "sine", 0.4, 0.15);
+      } else {
+        btn.style.background = "#e74c3c";
+        const corrBtn = area.querySelector(`[data-val="${d.correcta}"]`);
+        if (corrBtn) corrBtn.style.background = "#2ecc71";
+        fb.textContent = `❌ Era: ${d.correcta}`;
+        fb.style.color = "#e74c3c";
+      }
+      area.querySelectorAll(".danza-opt").forEach((b) => (b.disabled = true));
+      current++;
+      if (current >= danzas.length) {
+        setTimeout(() => {
+          area.innerHTML = `
+            <div class="game-result fadeIn">
+              <div style="font-size:3rem;">🎭</div>
+              <h2>¡Conoces las danzas del Cauca!</h2>
+              <p>Puntaje: <strong>${score} / ${danzas.length}</strong></p>
+              <p style="font-size:0.85rem;color:#555;">Bambuco · Currulao · Chirimía · Marimba · Rajaleña</p>
+              <button class="game-btn" onclick="gameRenderers['danza-cauca'](this.closest('.game-area'))">Jugar de nuevo</button>
+            </div>`;
+        }, 1500);
+      } else {
+        setTimeout(renderInfo, 1500);
+      }
+    });
+  }
+  renderInfo();
+};
+
+// ── 4. Pistas Musicales Offline ────────────────────────────────────────────────
+gameRenderers["pistas-offline"] = function (area) {
+  const pads = [
+    { label: "Marimba", icon: "🪘", freq: 392, type: "triangle", dur: 0.4, color: "#e74c3c" },
+    { label: "Cununo", icon: "🥁", freq: 120, type: "sine", dur: 0.3, color: "#e67e22" },
+    { label: "Bombo", icon: "💥", freq: 60, type: "sine", dur: 0.5, color: "#f39c12" },
+    { label: "Guasa", icon: "🪇", freq: 900, type: "square", dur: 0.15, color: "#2ecc71" },
+    { label: "Flauta", icon: "🪈", freq: 784, type: "sine", dur: 0.35, color: "#3498db" },
+    { label: "Tiple", icon: "🎸", freq: 330, type: "sawtooth", dur: 0.3, color: "#9b59b6" },
+    { label: "Tambora", icon: "🥁", freq: 80, type: "sine", dur: 0.4, color: "#1abc9c" },
+    { label: "Shaker", icon: "✨", freq: 1100, type: "square", dur: 0.12, color: "#e84393" },
+  ];
+  const melodias = [
+    { name: "Bambuco", notes: [392, 440, 392, 330, 294, 330, 392, 440, 523, 440, 392], dur: 0.25, bpm: 90 },
+    { name: "Currulao", notes: [220, 247, 277, 294, 330, 294, 247, 220], dur: 0.3, bpm: 100 },
+    { name: "Chirimía", notes: [523, 587, 659, 698, 659, 587, 523, 494, 523], dur: 0.2, bpm: 120 },
+  ];
+
+  let stopFlag = false;
+
+  area.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="fono-header" style="background:#9b59b6;color:#fff;border-radius:10px;padding:8px 16px;">
+        <span>🎵 Instrumentos del Cauca — Toca para sonar</span>
+      </div>
+      <div id="pads-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+        ${pads
+          .map(
+            (p, i) => `
+          <button class="arte-pad" data-idx="${i}" style="background:${p.color};color:#fff;border:none;border-radius:14px;padding:18px 8px;font-size:0.85rem;font-weight:bold;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 4px 0 rgba(0,0,0,0.25);transition:transform 0.1s,box-shadow 0.1s;">
+            <span style="font-size:2rem;">${p.icon}</span>
+            <span>${p.label}</span>
+          </button>`,
+          )
+          .join("")}
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:10px 14px;border:1px solid #eee;">
+        <p style="font-weight:bold;margin:0 0 8px;font-size:0.9rem;">🎼 Reproducir melodía tradicional:</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${melodias.map((m, i) => `<button class="game-btn mel-btn" data-idx="${i}" style="padding:6px 14px;font-size:0.85rem;">${m.name}</button>`).join("")}
+          <button id="stop-mel" class="game-btn" style="padding:6px 14px;font-size:0.85rem;background:#e74c3c;">⏹️ Detener</button>
+        </div>
+        <p id="mel-status" style="font-size:0.8rem;color:#888;margin:6px 0 0;min-height:1.2em;"></p>
+      </div>
+    </div>`;
+
+  document.getElementById("pads-grid").addEventListener("click", (e) => {
+    const btn = e.target.closest(".arte-pad");
+    if (!btn) return;
+    const pad = pads[Number.parseInt(btn.dataset.idx, 10)];
+    artBeep(pad.freq, pad.dur, pad.type, 0.6);
+    btn.style.transform = "scale(0.93) translateY(4px)";
+    btn.style.boxShadow = "none";
+    setTimeout(() => {
+      btn.style.transform = "";
+      btn.style.boxShadow = "0 4px 0 rgba(0,0,0,0.25)";
+    }, 120);
+  });
+
+  area.addEventListener("click", (e) => {
+    const btn = e.target.closest(".mel-btn");
+    if (!btn) return;
+    stopFlag = true;
+    const mel = melodias[Number.parseInt(btn.dataset.idx, 10)];
+    const interval = 60000 / mel.bpm;
+    const status = document.getElementById("mel-status");
+    setTimeout(() => {
+      stopFlag = false;
+      if (status) status.textContent = `▶️ Reproduciendo: ${mel.name}…`;
+      mel.notes.forEach((freq, i) => {
+        setTimeout(() => {
+          if (stopFlag) return;
+          artBeep(freq, mel.dur, "sine", 0.5);
+          if (i === mel.notes.length - 1) {
+            const s = document.getElementById("mel-status");
+            if (s) s.textContent = `✅ ${mel.name} completado`;
+          }
+        }, i * interval);
+      });
+    }, 120);
+  });
+
+  document.getElementById("stop-mel").addEventListener("click", () => {
+    stopFlag = true;
+    const s = document.getElementById("mel-status");
+    if (s) s.textContent = "⏹️ Detenido";
+  });
+};
+
+// ── 5. Lienzo de Dibujos Digitales ─────────────────────────────────────────────
+gameRenderers["lienzo-digital"] = function (area) {
+  const colors = [
+    "#2d3436",
+    "#e74c3c",
+    "#e67e22",
+    "#f1c40f",
+    "#2ecc71",
+    "#3498db",
+    "#9b59b6",
+    "#1abc9c",
+    "#e84393",
+    "#ffffff",
+    "#fd79a8",
+    "#6c5ce7",
+  ];
+  let currentColor = colors[0];
+  let brushSize = 5;
+  let drawing = false;
+  let tool = "brush";
+  let startX = 0,
+    startY = 0;
+  let snapshot = null;
+
+  area.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:#fff;padding:8px;border-radius:12px;border:1px solid #eee;">
+        <div id="lienzo-palette" style="display:flex;gap:3px;flex-wrap:wrap;">
+          ${colors.map((c, i) => `<button class="lienzo-swatch" data-color="${c}" style="width:22px;height:22px;background:${c};border-radius:50%;border:2px solid ${i === 0 ? "#333" : "#ccc"};cursor:pointer;flex-shrink:0;"></button>`).join("")}
+        </div>
+        <div style="display:flex;gap:3px;flex-wrap:wrap;margin-left:4px;">
+          <button class="lienzo-tool game-btn" data-tool="brush"  style="padding:3px 8px;font-size:0.8rem;">🖌️</button>
+          <button class="lienzo-tool game-btn" data-tool="eraser" style="padding:3px 8px;font-size:0.8rem;background:#95a5a6;">⬜</button>
+          <button class="lienzo-tool game-btn" data-tool="line"   style="padding:3px 8px;font-size:0.8rem;background:#e67e22;">📏</button>
+          <button class="lienzo-tool game-btn" data-tool="circle" style="padding:3px 8px;font-size:0.8rem;background:#9b59b6;">⭕</button>
+          <button class="lienzo-tool game-btn" data-tool="rect"   style="padding:3px 8px;font-size:0.8rem;background:#e74c3c;">▭</button>
+        </div>
+        <label style="font-size:0.78rem;white-space:nowrap;">Grosor:<input type="range" id="lienzo-sz" min="1" max="24" value="${brushSize}" style="width:60px;vertical-align:middle;margin-left:4px;"></label>
+        <button id="lienzo-clear" class="game-btn" style="padding:3px 8px;font-size:0.8rem;background:#e74c3c;">🗑️</button>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;background:#fff;padding:6px 10px;border-radius:12px;border:1px solid #eee;">
+        <span style="font-size:0.8rem;font-weight:bold;color:#555;">Plantillas del Cauca:</span>
+        <button class="game-btn lienzo-tpl" data-tpl="condor"  style="padding:3px 10px;font-size:0.8rem;background:#3498db;">🦅 Cóndor</button>
+        <button class="game-btn lienzo-tpl" data-tpl="flor"    style="padding:3px 10px;font-size:0.8rem;background:#e74c3c;">🌸 Flor</button>
+        <button class="game-btn lienzo-tpl" data-tpl="casa"    style="padding:3px 10px;font-size:0.8rem;background:#e67e22;">🏠 Vereda</button>
+      </div>
+      <canvas id="lienzo-canvas" width="640" height="320" style="background:#fff;border-radius:12px;border:2px solid #ddd;cursor:crosshair;display:block;max-width:100%;"></canvas>
+      <p id="lienzo-tool-label" style="font-size:0.78rem;color:#888;text-align:center;margin:0;">Herramienta: 🖌️ Pincel</p>
+    </div>`;
+
+  const canvas = document.getElementById("lienzo-canvas");
+  const ctx = canvas.getContext("2d");
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  function drawCondorTpl() {
+    ctx.save();
+    ctx.strokeStyle = "#2d3436";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(320, 160, 40, 20, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(280, 160);
+    ctx.quadraticCurveTo(200, 120, 150, 140);
+    ctx.quadraticCurveTo(180, 162, 280, 165);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(360, 160);
+    ctx.quadraticCurveTo(440, 120, 490, 140);
+    ctx.quadraticCurveTo(460, 162, 360, 165);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(320, 140, 16, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function drawFlorTpl() {
+    ctx.save();
+    const cx = 320,
+      cy = 170;
+    ctx.strokeStyle = "#27ae60";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + 20);
+    ctx.lineTo(cx, cy + 80);
+    ctx.stroke();
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2,
+        px = cx + Math.cos(a) * 35,
+        py = cy + Math.sin(a) * 35;
+      ctx.beginPath();
+      ctx.strokeStyle = "#e74c3c";
+      ctx.ellipse(px, py, 14, 22, a, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.fillStyle = "#f1c40f";
+    ctx.arc(cx, cy, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  function drawCasaTpl() {
+    ctx.save();
+    ctx.strokeStyle = "#e67e22";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(250, 180, 140, 100);
+    ctx.beginPath();
+    ctx.moveTo(240, 180);
+    ctx.lineTo(320, 120);
+    ctx.lineTo(400, 180);
+    ctx.stroke();
+    ctx.strokeRect(300, 230, 40, 50);
+    ctx.strokeRect(260, 200, 30, 25);
+    ctx.beginPath();
+    ctx.moveTo(275, 200);
+    ctx.lineTo(275, 225);
+    ctx.moveTo(260, 212);
+    ctx.lineTo(290, 212);
+    ctx.stroke();
+    ctx.strokeStyle = "#27ae60";
+    ctx.beginPath();
+    ctx.moveTo(100, 280);
+    ctx.lineTo(170, 200);
+    ctx.lineTo(240, 280);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(400, 280);
+    ctx.lineTo(470, 210);
+    ctx.lineTo(540, 280);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  document.getElementById("lienzo-palette").addEventListener("click", (e) => {
+    const btn = e.target.closest(".lienzo-swatch");
+    if (!btn) return;
+    currentColor = btn.dataset.color;
+    document.querySelectorAll(".lienzo-swatch").forEach((b) => (b.style.borderColor = "#ccc"));
+    btn.style.borderColor = "#333";
+    tool = "brush";
+    document.getElementById("lienzo-tool-label").textContent = "Herramienta: 🖌️ Pincel";
+  });
+
+  area.addEventListener("click", (e) => {
+    const toolBtn = e.target.closest(".lienzo-tool");
+    if (toolBtn) {
+      tool = toolBtn.dataset.tool;
+      const labels = {
+        brush: "🖌️ Pincel",
+        eraser: "⬜ Borrador",
+        line: "📏 Línea",
+        circle: "⭕ Círculo",
+        rect: "▭ Rectángulo",
+      };
+      document.getElementById("lienzo-tool-label").textContent = `Herramienta: ${labels[tool] || tool}`;
+    }
+    const tplBtn = e.target.closest(".lienzo-tpl");
+    if (tplBtn) {
+      if (tplBtn.dataset.tpl === "condor") drawCondorTpl();
+      else if (tplBtn.dataset.tpl === "flor") drawFlorTpl();
+      else if (tplBtn.dataset.tpl === "casa") drawCasaTpl();
+    }
+  });
+
+  document.getElementById("lienzo-sz").addEventListener("input", (e) => {
+    brushSize = Number.parseInt(e.target.value, 10);
+  });
+  document
+    .getElementById("lienzo-clear")
+    .addEventListener("click", () => ctx.clearRect(0, 0, canvas.width, canvas.height));
+
+  canvas.addEventListener("mousedown", (e) => {
+    startX = e.offsetX;
+    startY = e.offsetY;
+    drawing = true;
+    if (tool === "brush" || tool === "eraser") {
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    } else {
+      snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    }
+  });
+  canvas.addEventListener("mousemove", (e) => {
+    if (!drawing) return;
+    if (tool === "brush") {
+      ctx.strokeStyle = currentColor;
+      ctx.lineWidth = brushSize;
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+    } else if (tool === "eraser") {
+      ctx.clearRect(e.offsetX - brushSize, e.offsetY - brushSize, brushSize * 2, brushSize * 2);
+    } else {
+      ctx.putImageData(snapshot, 0, 0);
+      ctx.strokeStyle = currentColor;
+      ctx.lineWidth = brushSize;
+      if (tool === "line") {
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+      } else if (tool === "circle") {
+        const rx = Math.abs(e.offsetX - startX) / 2,
+          ry = Math.abs(e.offsetY - startY) / 2;
+        ctx.beginPath();
+        ctx.ellipse(startX + (e.offsetX - startX) / 2, startY + (e.offsetY - startY) / 2, rx, ry, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (tool === "rect") {
+        ctx.beginPath();
+        ctx.strokeRect(startX, startY, e.offsetX - startX, e.offsetY - startY);
+      }
+    }
+  });
+  canvas.addEventListener("mouseup", () => {
+    drawing = false;
+  });
+  canvas.addEventListener("mouseleave", () => {
+    drawing = false;
+  });
+};
+
+// ── 6. Coreografías Básicas ────────────────────────────────────────────────────
+gameRenderers["coreografias"] = function (area) {
+  const danzas = [
+    {
+      name: "Bambuco",
+      emoji: "🎻",
+      color: "#9b59b6",
+      descripcion: "Movimientos elegantes con pañuelo, característicos de los Andes caucanos.",
+      pasos: [
+        { symbol: "➡️", label: "Paso derecha", freq: 440 },
+        { symbol: "⬅️", label: "Paso izquierda", freq: 392 },
+        { symbol: "👐", label: "Abre brazos", freq: 523 },
+        { symbol: "🔄", label: "Giro completo", freq: 587 },
+        { symbol: "⬆️", label: "Paso adelante", freq: 659 },
+        { symbol: "⬇️", label: "Paso atrás", freq: 494 },
+      ],
+    },
+    {
+      name: "Currulao",
+      emoji: "🥁",
+      color: "#e74c3c",
+      descripcion: "Pasos del litoral Pacífico con movimientos de tierra y comunidad afro.",
+      pasos: [
+        { symbol: "🦶", label: "Golpe de pie", freq: 180 },
+        { symbol: "👏", label: "Palmas", freq: 900 },
+        { symbol: "⬇️", label: "Flexión", freq: 220 },
+        { symbol: "🔄", label: "Giro", freq: 294 },
+        { symbol: "👐", label: "Brazos abiertos", freq: 330 },
+        { symbol: "⬆️", label: "Incorporarse", freq: 392 },
+      ],
+    },
+    {
+      name: "Chirimía",
+      emoji: "🎺",
+      color: "#e67e22",
+      descripcion: "Danza festiva y alegre del norte del Cauca.",
+      pasos: [
+        { symbol: "⬆️", label: "Adelante", freq: 523 },
+        { symbol: "➡️", label: "Derecha", freq: 659 },
+        { symbol: "⬆️", label: "Adelante", freq: 523 },
+        { symbol: "⬅️", label: "Izquierda", freq: 784 },
+        { symbol: "👏", label: "Palmas", freq: 900 },
+        { symbol: "🔄", label: "Giro", freq: 698 },
+      ],
+    },
+  ];
+
+  const SEQ_LEN = 4;
+  let danzaIdx = 0,
+    sequence = [],
+    userSeq = [];
+
+  function selectDanza() {
+    area.innerHTML = `
+      <div class="quiz-container fadeIn">
+        <div style="text-align:center;margin-bottom:12px;">
+          <h2>💃 Coreografías Básicas</h2>
+          <p style="color:#666;font-size:0.9rem;">Elige una danza del Cauca y sigue sus pasos</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+          ${danzas
+            .map(
+              (d, i) => `
+            <button class="danza-sel-btn" data-idx="${i}" style="background:${d.color};color:#fff;border:none;border-radius:14px;padding:16px 8px;cursor:pointer;font-size:0.85rem;font-weight:bold;display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <span style="font-size:2rem;">${d.emoji}</span>
+              <span>${d.name}</span>
+            </button>`,
+            )
+            .join("")}
+        </div>
+      </div>`;
+    area.addEventListener("click", function handler(e) {
+      const btn = e.target.closest(".danza-sel-btn");
+      if (!btn) return;
+      area.removeEventListener("click", handler);
+      danzaIdx = Number.parseInt(btn.dataset.idx, 10);
+      buildSequence();
+    });
+  }
+
+  function buildSequence() {
+    const d = danzas[danzaIdx];
+    sequence = [];
+    for (let i = 0; i < SEQ_LEN; i++) {
+      sequence.push(d.pasos[Math.floor(Math.random() * d.pasos.length)]);
+    }
+    showSequence();
+  }
+
+  function showSequence() {
+    const d = danzas[danzaIdx];
+    area.innerHTML = `
+      <div class="quiz-container fadeIn">
+        <div class="fono-header" style="background:${d.color};color:#fff;border-radius:10px;padding:8px 16px;margin-bottom:8px;">
+          <span>${d.emoji} ${d.name}</span>
+          <span>¡Memoriza los pasos!</span>
+        </div>
+        <p style="text-align:center;font-size:0.88rem;color:#555;margin:4px 0 8px;">${d.descripcion}</p>
+        <div id="coreo-display" style="display:flex;gap:10px;justify-content:center;margin:12px 0;min-height:80px;align-items:center;flex-wrap:wrap;"></div>
+        <p id="coreo-status" style="text-align:center;color:#888;font-size:0.9rem;margin:0;">Observa la secuencia…</p>
+      </div>`;
+
+    const display = document.getElementById("coreo-display");
+    let i = 0;
+    function showNext() {
+      if (i >= sequence.length) {
+        setTimeout(playPhase, 700);
+        return;
+      }
+      display.innerHTML = `
+        <div style="background:${d.color}22;border:3px solid ${d.color};border-radius:14px;padding:10px 18px;text-align:center;">
+          <div style="font-size:2.6rem;">${sequence[i].symbol}</div>
+          <div style="font-size:0.75rem;color:#555;">${sequence[i].label}</div>
+        </div>`;
+      artBeep(sequence[i].freq, 0.2, "sine", 0.4);
+      i++;
+      setTimeout(showNext, 950);
+    }
+    showNext();
+  }
+
+  function playPhase() {
+    const d = danzas[danzaIdx];
+    userSeq = [];
+    area.innerHTML = `
+      <div class="quiz-container fadeIn">
+        <div class="fono-header" style="background:${d.color};color:#fff;border-radius:10px;padding:8px 16px;margin-bottom:8px;">
+          <span>${d.emoji} ${d.name}</span>
+          <span id="coreo-counter">Tu turno: 0/${SEQ_LEN}</span>
+        </div>
+        <p style="text-align:center;font-size:0.9rem;margin:4px 0 8px;">¡Repite los pasos en el mismo orden!</p>
+        <div id="user-seq" style="display:flex;gap:8px;justify-content:center;min-height:46px;margin:4px 0 8px;font-size:2rem;align-items:center;flex-wrap:wrap;"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;">
+          ${d.pasos
+            .map(
+              (p, i) => `
+            <button class="coreo-btn game-btn" data-idx="${i}" style="background:${d.color};padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <span style="font-size:1.8rem;">${p.symbol}</span>
+              <span style="font-size:0.7rem;">${p.label}</span>
+            </button>`,
+            )
+            .join("")}
+        </div>
+        <p id="coreo-fb" class="math-feedback"></p>
+      </div>`;
+
+    const seqEl = document.getElementById("user-seq");
+    const counter = document.getElementById("coreo-counter");
+
+    area.addEventListener("click", function handler(e) {
+      const btn = e.target.closest(".coreo-btn");
+      if (!btn) return;
+      const idx = Number.parseInt(btn.dataset.idx, 10);
+      const paso = d.pasos[idx];
+      userSeq.push(paso);
+      artBeep(paso.freq, 0.15, "sine", 0.4);
+      seqEl.innerHTML = userSeq.map((p) => `<span title="${p.label}">${p.symbol}</span>`).join(" ");
+      if (counter) counter.textContent = `Tu turno: ${userSeq.length}/${SEQ_LEN}`;
+
+      const pos = userSeq.length - 1;
+      if (userSeq[pos].symbol !== sequence[pos].symbol) {
+        area.removeEventListener("click", handler);
+        const fb = document.getElementById("coreo-fb");
+        fb.textContent = `❌ Paso ${pos + 1} incorrecto. Era: ${sequence[pos].symbol} (${sequence[pos].label})`;
+        fb.style.color = "#e74c3c";
+        setTimeout(() => showResult(false), 1600);
+        return;
+      }
+      if (userSeq.length >= SEQ_LEN) {
+        area.removeEventListener("click", handler);
+        const fb = document.getElementById("coreo-fb");
+        fb.textContent = "✅ ¡Perfecto! ¡Completaste todos los pasos!";
+        fb.style.color = "#2ecc71";
+        artBeep(523, 0.15, "sine", 0.5, 0);
+        artBeep(659, 0.15, "sine", 0.5, 0.15);
+        artBeep(784, 0.2, "sine", 0.5, 0.3);
+        setTimeout(() => showResult(true), 1500);
+      }
+    });
+  }
+
+  function showResult(success) {
+    const d = danzas[danzaIdx];
+    area.innerHTML = `
+      <div class="game-result fadeIn">
+        <div style="font-size:3rem;">${success ? "🏆" : "💪"}</div>
+        <h2 style="color:${d.color};">${success ? "¡Excelente bailarín!" : "¡Buen intento!"}</h2>
+        <p>Danza: <strong>${d.name}</strong></p>
+        <p>Secuencia: ${sequence.map((p) => p.symbol).join(" ")}</p>
+        <p>Tu respuesta: ${userSeq.map((p) => p.symbol).join(" ")}</p>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px;">
+          <button class="game-btn" onclick="gameRenderers['coreografias'](this.closest('.game-area'))">Elegir otra danza</button>
+          <button class="game-btn" style="background:${d.color};" id="retry-coreo">Repetir</button>
+        </div>
+      </div>`;
+    document.getElementById("retry-coreo").addEventListener("click", buildSequence);
+  }
+
+  selectDanza();
+};
+
+// ── 7. Festival Iberoamericano de Teatro y Artesanías Caucanas ──────────────────
+gameRenderers["festival-artesanias"] = function (area) {
+  let temaActual = "teatro";
+  let quizCurrent = 0,
+    quizScore = 0;
+
+  const infoTeatro = [
+    {
+      icon: "🎭",
+      title: "Festival Iberoamericano de Teatro",
+      desc: "El FITB (Festival Iberoamericano de Teatro de Bogotá) es uno de los festivales de teatro más grandes del mundo. Reúne compañías de más de 60 países. En el Cauca, el teatro comunitario y de calle tiene gran tradición.",
+    },
+    {
+      icon: "🎪",
+      title: "Teatro del Cauca",
+      desc: "El Cauca tiene una rica tradición de teatro comunitario. Grupos como el Teatro Mosca y el Frente de Teatro del Cauca llevan el arte escénico a veredas y municipios apartados.",
+    },
+    {
+      icon: "🪆",
+      title: "Máscaras y Vestuario",
+      desc: "Los actores caucanos usan máscaras y vestuarios inspirados en animales del Cauca, la naturaleza y las tradiciones ancestrales de los pueblos indígenas y afrocolombianos.",
+    },
+    {
+      icon: "🌟",
+      title: "Teatro Ritual Nasa",
+      desc: "Las comunidades Nasa del Cauca tienen formas propias de expresión teatral: rituales, danzas ceremoniales y representaciones de su cosmogonía que narran la creación del mundo.",
+    },
+  ];
+  const infoArtesanias = [
+    {
+      icon: "🧵",
+      title: "Tejidos Nasa (Páez)",
+      desc: "Los tejidos en lana de los Nasa son coloridos y geométricos. El rombo simboliza el ojo del dios del agua, las líneas representan los caminos del territorio ancestral.",
+    },
+    {
+      icon: "🪴",
+      title: "Alfarería de Popayán",
+      desc: "La cerámica caucana es reconocida por sus figuras de barro cocido. En municipios como El Tambo se elaboran piezas de barro con técnicas prehispánicas conservadas por generaciones.",
+    },
+    {
+      icon: "🎋",
+      title: "Cestería en Guadua",
+      desc: "Los artesanos crean canastos, muebles y adornos en guadua, el bambú gigante del Cauca. Es un material renovable y resistente, símbolo del paisaje caucano.",
+    },
+    {
+      icon: "🪵",
+      title: "Talla en Madera",
+      desc: "En El Tambo y Timbío los artesanos tallan figuras de santos, animales y escenas del campo en madera, mezclando herencia española e indígena en cada pieza.",
+    },
+  ];
+  const quizTeatro = [
+    {
+      q: "¿Cómo se llama el gran festival de teatro iberoamericano?",
+      opts: ["FITB", "FESTICAUCA", "TEATRO ANDINO", "CARNAVAL"],
+      ans: "FITB",
+    },
+    {
+      q: "¿Qué usan los actores caucanos para representar animales?",
+      opts: ["Máscaras", "Trajes espaciales", "Robots", "Solo la voz"],
+      ans: "Máscaras",
+    },
+    {
+      q: "¿Qué comunidad indígena del Cauca tiene teatro ritual?",
+      opts: ["Comunidad Nasa", "Comunidad Wayú", "Comunidad Emberá", "Comunidad Sikuani"],
+      ans: "Comunidad Nasa",
+    },
+  ];
+  const quizArtesanias = [
+    {
+      q: "¿Qué simboliza el rombo en los tejidos Nasa?",
+      opts: ["El ojo del dios del agua", "El sol", "La luna", "Una montaña"],
+      ans: "El ojo del dios del agua",
+    },
+    {
+      q: "¿Qué artesanía se hace con guadua en el Cauca?",
+      opts: ["Cestería", "Tejidos", "Máscaras", "Pinturas"],
+      ans: "Cestería",
+    },
+    {
+      q: "¿En qué municipio del Cauca hay tradición de talla en madera?",
+      opts: ["El Tambo", "Inzá", "López", "La Sierra"],
+      ans: "El Tambo",
+    },
+  ];
+
+  function renderMain() {
+    area.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:8px;">
+          <button id="tab-teatro"     class="game-btn" style="flex:1;padding:10px;font-size:0.9rem;background:${temaActual === "teatro" ? "#e74c3c" : "#95a5a6"};">🎭 Teatro</button>
+          <button id="tab-artesanias" class="game-btn" style="flex:1;padding:10px;font-size:0.9rem;background:${temaActual === "artesanias" ? "#e67e22" : "#95a5a6"};">🧵 Artesanías</button>
+        </div>
+        <div id="festival-content"></div>
+        <button id="festival-quiz-btn" class="game-btn" style="background:${temaActual === "teatro" ? "#e74c3c" : "#e67e22"};">🎯 ¡Jugar Quiz sobre ${temaActual === "teatro" ? "Teatro" : "Artesanías"}!</button>
+      </div>`;
+
+    document.getElementById("tab-teatro").addEventListener("click", () => {
+      temaActual = "teatro";
+      renderMain();
+    });
+    document.getElementById("tab-artesanias").addEventListener("click", () => {
+      temaActual = "artesanias";
+      renderMain();
+    });
+    document.getElementById("festival-quiz-btn").addEventListener("click", () => {
+      quizCurrent = 0;
+      quizScore = 0;
+      renderQuiz();
+    });
+
+    const info = temaActual === "teatro" ? infoTeatro : infoArtesanias;
+    const content = document.getElementById("festival-content");
+    content.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${info
+          .map(
+            (item) => `
+          <div style="background:#fff;border-radius:12px;padding:10px;border:1px solid #eee;display:flex;flex-direction:column;gap:4px;">
+            <div style="font-size:1.8rem;">${item.icon}</div>
+            <strong style="font-size:0.85rem;color:#333;">${item.title}</strong>
+            <p style="font-size:0.78rem;color:#666;margin:0;line-height:1.4;">${item.desc}</p>
+            <button class="game-btn narrar-btn" data-text="${item.title}. ${item.desc}" style="padding:2px 8px;font-size:0.74rem;background:#3498db;margin-top:4px;align-self:flex-start;">🔊 Escuchar</button>
+          </div>`,
+          )
+          .join("")}
+      </div>`;
+
+    content.addEventListener("click", (e) => {
+      const btn = e.target.closest(".narrar-btn");
+      if (btn) narrateText(btn.dataset.text);
+    });
+  }
+
+  function renderQuiz() {
+    const quizData = temaActual === "teatro" ? quizTeatro : quizArtesanias;
+    if (quizCurrent >= quizData.length) {
+      const icon = temaActual === "teatro" ? "🎭" : "🧵";
+      area.innerHTML = `
+        <div class="game-result fadeIn">
+          <div style="font-size:3rem;">${icon}</div>
+          <h2>¡Conoces el ${temaActual === "teatro" ? "Teatro" : "Arte Artesanal"} del Cauca!</h2>
+          <p>Puntaje: <strong>${quizScore} / ${quizData.length}</strong></p>
+          <button class="game-btn" onclick="gameRenderers['festival-artesanias'](this.closest('.game-area'))">Volver al inicio</button>
+        </div>`;
+      return;
+    }
+    const q = quizData[quizCurrent];
+    const opts = [...q.opts].sort(() => Math.random() - 0.5);
+    area.innerHTML = `
+      <div class="quiz-container fadeIn">
+        <div class="fono-header" style="background:${temaActual === "teatro" ? "#e74c3c" : "#e67e22"};color:#fff;border-radius:10px;padding:8px 16px;">
+          <span>${temaActual === "teatro" ? "🎭 Teatro" : "🧵 Artesanías"} del Cauca</span>
+          <span>Puntaje: ${quizScore} | ${quizCurrent + 1}/${quizData.length}</span>
+        </div>
+        <p class="quiz-question">${q.q}</p>
+        <div class="multi-options">
+          ${opts.map((o) => `<button class="option-btn fest-opt" data-val="${o}">${o}</button>`).join("")}
+        </div>
+        <p id="fest-fb" class="math-feedback"></p>
+        <button id="fest-volver" class="game-btn" style="margin-top:8px;background:#95a5a6;padding:6px 14px;font-size:0.85rem;">← Volver</button>
+      </div>`;
+
+    document.getElementById("fest-volver").addEventListener("click", renderMain);
+    area.querySelector(".multi-options").addEventListener("click", (e) => {
+      const btn = e.target.closest(".fest-opt");
+      if (!btn) return;
+      const fb = document.getElementById("fest-fb");
+      const correct = btn.dataset.val === q.ans;
+      if (correct) {
+        quizScore++;
+        btn.style.background = "#2ecc71";
+        fb.textContent = "✅ ¡Correcto!";
+        fb.style.color = "#2ecc71";
+        artBeep(523, 0.15, "sine", 0.4, 0);
+        artBeep(659, 0.15, "sine", 0.4, 0.15);
+      } else {
+        btn.style.background = "#e74c3c";
+        const corrBtn = area.querySelector(`[data-val="${q.ans}"]`);
+        if (corrBtn) corrBtn.style.background = "#2ecc71";
+        fb.textContent = `❌ La respuesta era: ${q.ans}`;
+        fb.style.color = "#e74c3c";
+      }
+      area.querySelectorAll(".fest-opt").forEach((b) => (b.disabled = true));
+      quizCurrent++;
+      setTimeout(renderQuiz, 1500);
+    });
+  }
+
+  renderMain();
 };
