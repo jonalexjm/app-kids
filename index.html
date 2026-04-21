@@ -52,7 +52,7 @@
         <div class="welcome" id="welcome">
           <div class="welcome-header">
             <h1 class="welcome-title">¡Bienvenido a <span>App Kids</span>!</h1>
-            <p class="welcome-sub">¡Explota los globos y luego elige tu materia favorita! 🎈</p>
+            <p class="welcome-sub">¡Explota los globos o elige un mini-juego para entrenar tu mente! 🧠🎈</p>
           </div>
           <div class="welcome-game-wrap">
             <canvas id="balloon-canvas" width="640" height="340"></canvas>
@@ -61,9 +61,26 @@
               <span id="balloon-combo-label"></span>
             </div>
           </div>
-          <div class="welcome-subjects">
-            <p class="welcome-subjects-hint">O elige una materia directamente:</p>
-            <div class="welcome-subject-chips" id="welcome-chips"></div>
+          <div class="wg-section" id="wg-section">
+            <p class="wg-section-title">🎮 ¡Entrena tu mente con estos mini-juegos!</p>
+            <div class="wg-tiles" id="wg-tiles">
+              <button class="wg-tile" data-wg="memoria">
+                <span class="wg-tile-icon">🧠</span>
+                <strong class="wg-tile-name">Memoria</strong>
+                <span class="wg-tile-desc">Encuentra las parejas</span>
+              </button>
+              <button class="wg-tile" data-wg="diferente" style="animation-delay: 0.08s">
+                <span class="wg-tile-icon">🎯</span>
+                <strong class="wg-tile-name">¿Cuál no va?</strong>
+                <span class="wg-tile-desc">Halla el diferente</span>
+              </button>
+              <button class="wg-tile" data-wg="cuenta" style="animation-delay: 0.16s">
+                <span class="wg-tile-icon">🔢</span>
+                <strong class="wg-tile-name">¡Cuántos hay!</strong>
+                <span class="wg-tile-desc">Cuenta y elige</span>
+              </button>
+            </div>
+            <div id="wg-panel" class="wg-panel" style="display: none"></div>
           </div>
         </div>
         <div class="game-view" id="game-view" style="display: none">

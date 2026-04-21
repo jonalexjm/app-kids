@@ -342,32 +342,290 @@ const gameDescriptions = buildGameIndex();
   if (welcome) observer.observe(welcome, { attributes: true, attributeFilter: ["style"] });
 })();
 
-// ── Chips de materias en la bienvenida ────────────────────────────────────────
-(function buildWelcomeChips() {
-  const wrap = document.getElementById("welcome-chips");
-  if (!wrap) return;
-  const chipColors = [
-    "linear-gradient(135deg,#a29bfe,#6c5ce7)",
-    "linear-gradient(135deg,#fd79a8,#e84393)",
-    "linear-gradient(135deg,#55efc4,#00b894)",
-    "linear-gradient(135deg,#74b9ff,#0984e3)",
-    "linear-gradient(135deg,#ffeaa7,#fdcb6e)",
-  ];
-  menuConfig.forEach((mat, i) => {
-    const btn = document.createElement("button");
-    btn.className = "welcome-chip";
-    btn.style.background = chipColors[i % chipColors.length];
-    btn.style.animationDelay = `${i * 0.08}s`;
-    btn.innerHTML = `<span class="chip-icon">${mat.icon}</span>${mat.label}`;
-    btn.addEventListener("click", () => {
-      // Abrir la materia en el menú lateral y mostrar el primer juego
-      const menuItem = document.querySelector(`.menu-btn[data-target="${mat.id}"]`);
-      if (menuItem) {
-        menuItem.click();
-        setCatBubble(`${mat.icon} ${mat.label}`);
-      }
+// ── Mini-juegos didácticos de concentración y retroalimentación ───────────────
+(function buildWelcomeMiniGames() {
+  const panel = document.getElementById("wg-panel");
+  const tilesWrap = document.getElementById("wg-tiles");
+  const balloonWrap = document.querySelector(".welcome-game-wrap");
+  if (!panel || !tilesWrap) return;
+
+  function showTiles() {
+    panel.style.display = "none";
+    panel.innerHTML = "";
+    tilesWrap.style.display = "flex";
+    if (balloonWrap) balloonWrap.style.display = "";
+  }
+
+  function showPanel(html) {
+    if (balloonWrap) balloonWrap.style.display = "none";
+    tilesWrap.style.display = "none";
+    panel.innerHTML = html;
+    panel.style.display = "block";
+    panel.querySelector(".wg-back-btn")?.addEventListener("click", showTiles);
+  }
+
+  // ── Juego 1: Memoria (concentración — parejas de emojis) ─────────────────
+  function runMemoria() {
+    const pool = ["🐱", "🐶", "🦋", "🌈", "⭐", "🎈", "🍭", "🌸", "🦄", "🎊"];
+    const chosen = pool.slice(0, 6);
+    const cards = [...chosen, ...chosen].sort(() => Math.random() - 0.5);
+    let flipped = [],
+      matched = 0,
+      moves = 0,
+      locked = false;
+
+    showPanel(`
+      <div class="wg-game-header">
+        <button class="wg-back-btn">← Volver</button>
+        <span class="wg-game-title">🧠 Memoria</span>
+        <span class="wg-game-stat" id="mem-moves">👆 0 movimientos</span>
+      </div>
+      <div class="mem-grid" id="mem-grid"></div>
+      <div class="wg-msg" id="wg-msg"></div>
+    `);
+
+    const grid = document.getElementById("mem-grid");
+    cards.forEach((emoji) => {
+      const btn = document.createElement("button");
+      btn.className = "mem-card";
+      btn.textContent = "❓";
+      btn.dataset.emoji = emoji;
+      btn.addEventListener("click", () => {
+        if (locked || btn.classList.contains("matched") || btn.classList.contains("flipped")) return;
+        btn.textContent = emoji;
+        btn.classList.add("flipped");
+        flipped.push(btn);
+        if (flipped.length === 2) {
+          locked = true;
+          moves++;
+          document.getElementById("mem-moves").textContent = `👆 ${moves} movimiento${moves !== 1 ? "s" : ""}`;
+          if (flipped[0].dataset.emoji === flipped[1].dataset.emoji) {
+            flipped.forEach((c) => c.classList.add("matched"));
+            matched += 2;
+            flipped = [];
+            locked = false;
+            if (matched === cards.length) {
+              const msg = document.getElementById("wg-msg");
+              msg.textContent = `🎉 ¡Ganaste en ${moves} movimientos!`;
+              msg.insertAdjacentHTML(
+                "beforeend",
+                ` <button class="wg-replay-btn" id="mem-replay" style="margin-left:10px">🔄 Otra vez</button>`,
+              );
+              document.getElementById("mem-replay")?.addEventListener("click", runMemoria);
+            }
+          } else {
+            setTimeout(() => {
+              flipped.forEach((c) => {
+                c.textContent = "❓";
+                c.classList.remove("flipped");
+              });
+              flipped = [];
+              locked = false;
+            }, 900);
+          }
+        }
+      });
+      grid.appendChild(btn);
     });
-    wrap.appendChild(btn);
+  }
+
+  // ── Juego 2: ¿Cuál no va? (discriminación visual) ────────────────────────
+  function runDiferente() {
+    const pool = [
+      "🐱",
+      "🐶",
+      "🦋",
+      "⭐",
+      "🍎",
+      "🚗",
+      "🎈",
+      "🌸",
+      "🦄",
+      "🎊",
+      "🍭",
+      "🌈",
+      "🔥",
+      "💎",
+      "🎵",
+      "🌺",
+      "🐠",
+      "🦊",
+      "🏆",
+      "🍦",
+      "🐸",
+      "🦖",
+    ];
+    let round = 0,
+      score = 0,
+      total = 8;
+
+    function renderRound() {
+      const gameEl = document.getElementById("dif-game");
+      if (!gameEl) return;
+      if (round >= total) {
+        const icon = score >= 6 ? "🏆" : score >= 4 ? "⭐" : "💪";
+        gameEl.innerHTML = `<div class="wg-final">
+          <div class="wg-final-icon">${icon}</div>
+          <div class="wg-final-text">¡Acertaste <strong>${score}</strong> de ${total}!</div>
+          <button class="wg-replay-btn" id="dif-replay">🔄 Jugar de nuevo</button>
+        </div>`;
+        document.getElementById("dif-replay")?.addEventListener("click", runDiferente);
+        return;
+      }
+      const idx1 = Math.floor(Math.random() * pool.length);
+      let idx2;
+      do {
+        idx2 = Math.floor(Math.random() * pool.length);
+      } while (idx2 === idx1);
+      const main = pool[idx1],
+        odd = pool[idx2];
+      const oddPos = Math.floor(Math.random() * 4);
+      const options = Array.from({ length: 4 }, (_, i) => (i === oddPos ? odd : main));
+
+      gameEl.innerHTML = `
+        <p class="dif-instruction">¿Cuál es diferente?</p>
+        <div class="dif-options" id="dif-opts"></div>
+        <div class="wg-msg" id="dif-msg"></div>
+      `;
+      const opts = document.getElementById("dif-opts");
+      options.forEach((emoji, i) => {
+        const btn = document.createElement("button");
+        btn.className = "dif-btn";
+        btn.textContent = emoji;
+        btn.addEventListener("click", () => {
+          opts.querySelectorAll(".dif-btn").forEach((b) => (b.disabled = true));
+          if (i === oddPos) {
+            btn.classList.add("correct");
+            score++;
+            document.getElementById("dif-score").textContent = `⭐ ${score}`;
+            document.getElementById("dif-msg").textContent = "✅ ¡Correcto!";
+          } else {
+            btn.classList.add("wrong");
+            opts.querySelectorAll(".dif-btn")[oddPos].classList.add("correct");
+            document.getElementById("dif-msg").textContent = "❌ ¡Casi! Era ese.";
+          }
+          round++;
+          setTimeout(renderRound, 1100);
+        });
+        opts.appendChild(btn);
+      });
+    }
+
+    showPanel(`
+      <div class="wg-game-header">
+        <button class="wg-back-btn">← Volver</button>
+        <span class="wg-game-title">🎯 ¿Cuál no va?</span>
+        <span class="wg-game-stat" id="dif-score">⭐ 0</span>
+      </div>
+      <div id="dif-game"></div>
+    `);
+    renderRound();
+  }
+
+  // ── Juego 3: ¡Cuántos hay! (retroalimentación numérica) ──────────────────
+  function runCuenta() {
+    const emojis = [
+      "🐱",
+      "🐶",
+      "⭐",
+      "🍎",
+      "🎈",
+      "🌸",
+      "🦄",
+      "🎊",
+      "🍭",
+      "🔥",
+      "💎",
+      "🎵",
+      "🌺",
+      "🐠",
+      "🦊",
+      "🍦",
+      "🏀",
+      "🎸",
+      "🐸",
+      "🦋",
+    ];
+    let round = 0,
+      score = 0,
+      total = 8;
+
+    function renderRound() {
+      const gameEl = document.getElementById("cnt-game");
+      if (!gameEl) return;
+      if (round >= total) {
+        const icon = score >= 6 ? "🏆" : score >= 4 ? "⭐" : "💪";
+        gameEl.innerHTML = `<div class="wg-final">
+          <div class="wg-final-icon">${icon}</div>
+          <div class="wg-final-text">¡Acertaste <strong>${score}</strong> de ${total}!</div>
+          <button class="wg-replay-btn" id="cnt-replay">🔄 Jugar de nuevo</button>
+        </div>`;
+        document.getElementById("cnt-replay")?.addEventListener("click", runCuenta);
+        return;
+      }
+      const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+      const count = 1 + Math.floor(Math.random() * 9); // 1-9
+
+      // 3 wrong numbers near count, no repeats
+      const candidates = [];
+      for (let n = Math.max(1, count - 3); n <= count + 3; n++) {
+        if (n !== count) candidates.push(n);
+      }
+      candidates.sort(() => Math.random() - 0.5);
+      const answers = [count, ...candidates.slice(0, 3)].sort(() => Math.random() - 0.5);
+
+      const emojiHtml = Array(count).fill(`<span>${emoji}</span>`).join("");
+      gameEl.innerHTML = `
+        <div class="cnt-display" id="cnt-display">${emojiHtml}</div>
+        <p class="cnt-instruction">¿Cuántos ${emoji} hay?</p>
+        <div class="cnt-options" id="cnt-opts"></div>
+        <div class="wg-msg" id="cnt-msg"></div>
+      `;
+      const opts = document.getElementById("cnt-opts");
+      answers.forEach((n) => {
+        const btn = document.createElement("button");
+        btn.className = "cnt-btn";
+        btn.textContent = n;
+        btn.addEventListener("click", () => {
+          opts.querySelectorAll(".cnt-btn").forEach((b) => (b.disabled = true));
+          if (n === count) {
+            btn.classList.add("correct");
+            score++;
+            document.getElementById("cnt-score").textContent = `⭐ ${score}`;
+            document.getElementById("cnt-msg").textContent = `✅ ¡Sí! Hay ${count} ${emoji}`;
+          } else {
+            btn.classList.add("wrong");
+            opts.querySelectorAll(".cnt-btn").forEach((b) => {
+              if (Number(b.textContent) === count) b.classList.add("correct");
+            });
+            document.getElementById("cnt-msg").textContent = `❌ Eran ${count} ${emoji}`;
+          }
+          round++;
+          setTimeout(renderRound, 1200);
+        });
+        opts.appendChild(btn);
+      });
+    }
+
+    showPanel(`
+      <div class="wg-game-header">
+        <button class="wg-back-btn">← Volver</button>
+        <span class="wg-game-title">🔢 ¡Cuántos hay!</span>
+        <span class="wg-game-stat" id="cnt-score">⭐ 0</span>
+      </div>
+      <div id="cnt-game"></div>
+    `);
+    renderRound();
+  }
+
+  // Conectar tiles con juegos
+  tilesWrap.addEventListener("click", (e) => {
+    const tile = e.target.closest(".wg-tile");
+    if (!tile) return;
+    const game = tile.dataset.wg;
+    if (game === "memoria") runMemoria();
+    else if (game === "diferente") runDiferente();
+    else if (game === "cuenta") runCuenta();
   });
 })();
 
