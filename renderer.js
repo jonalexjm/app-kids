@@ -80,6 +80,8 @@ document.getElementById("menu").addEventListener("click", (e) => {
 
   const gameArea = document.getElementById("game-area");
   gameArea.innerHTML = "";
+  // Detener cualquier audio en curso al cambiar de juego
+  if (typeof stopNarration === "function") stopNarration();
   if (gameRenderers[gameId]) {
     gameRenderers[gameId](gameArea);
   } else {

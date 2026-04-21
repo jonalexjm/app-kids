@@ -143,6 +143,14 @@ function narrateText(text) {
 
 function stopNarration() {
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  // Detener Web Audio (instrumentos, ritmos, melodías)
+  if (globalThis._artCtx && globalThis._artCtx.state !== "closed") {
+    globalThis._artCtx.suspend();
+  }
+  // Detener el flag de ritmos musicales
+  globalThis._ritmoStopFlag = true;
+  // Detener el flag de melodías de pistas offline
+  globalThis._melStopFlag = true;
 }
 
 function getMedal(pct) {
@@ -2072,10 +2080,13 @@ gameRenderers["mapa-vereda"] = function (area) {
 
 // ── Utilidad de audio compartida (Web Audio API) ─────────────────────────────
 function artAudio() {
+  // Reanuda el contexto si fue suspendido por stopNarration()
   if (!globalThis._artCtx) {
     // eslint-disable-next-line no-undef
     const Ctx = globalThis.AudioContext || globalThis.webkitAudioContext;
     globalThis._artCtx = new Ctx();
+  } else if (globalThis._artCtx.state === "suspended") {
+    globalThis._artCtx.resume();
   }
   return globalThis._artCtx;
 }
@@ -2230,15 +2241,15 @@ gameRenderers["ritmo-musical"] = function (area) {
   ];
   let level = 0,
     score = 0;
-  let ritmoStopFlag = false;
+  globalThis._ritmoStopFlag = false;
 
   function playPattern(pattern) {
-    ritmoStopFlag = false;
+    globalThis._ritmoStopFlag = false;
     const ms = 60000 / pattern.bpm / 2;
     pattern.beats.forEach((beat, i) => {
       if (!beat) return;
       setTimeout(() => {
-        if (ritmoStopFlag) return;
+        if (globalThis._ritmoStopFlag) return;
         artBeep(pattern.freqs[i % pattern.freqs.length], 0.15, "triangle", 0.5);
         const dots = document.querySelectorAll(".ritmo-dot");
         if (dots[i]) {
@@ -2294,7 +2305,7 @@ gameRenderers["ritmo-musical"] = function (area) {
 
     document.getElementById("ritmo-play").addEventListener("click", () => playPattern(pat));
     document.getElementById("ritmo-stop").addEventListener("click", () => {
-      ritmoStopFlag = true;
+      globalThis._ritmoStopFlag = true;
     });
     setTimeout(() => playPattern(pat), 500);
 
@@ -2500,7 +2511,7 @@ gameRenderers["pistas-offline"] = function (area) {
     { name: "Chirimía", notes: [523, 587, 659, 698, 659, 587, 523, 494, 523], dur: 0.2, bpm: 120 },
   ];
 
-  let stopFlag = false;
+  globalThis._melStopFlag = false;
 
   area.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:12px;">
@@ -2544,16 +2555,16 @@ gameRenderers["pistas-offline"] = function (area) {
   area.addEventListener("click", (e) => {
     const btn = e.target.closest(".mel-btn");
     if (!btn) return;
-    stopFlag = true;
+    globalThis._melStopFlag = true;
     const mel = melodias[Number.parseInt(btn.dataset.idx, 10)];
     const interval = 60000 / mel.bpm;
     const status = document.getElementById("mel-status");
     setTimeout(() => {
-      stopFlag = false;
+      globalThis._melStopFlag = false;
       if (status) status.textContent = `▶️ Reproduciendo: ${mel.name}…`;
       mel.notes.forEach((freq, i) => {
         setTimeout(() => {
-          if (stopFlag) return;
+          if (globalThis._melStopFlag) return;
           artBeep(freq, mel.dur, "sine", 0.5);
           if (i === mel.notes.length - 1) {
             const s = document.getElementById("mel-status");
@@ -2565,7 +2576,7 @@ gameRenderers["pistas-offline"] = function (area) {
   });
 
   document.getElementById("stop-mel").addEventListener("click", () => {
-    stopFlag = true;
+    globalThis._melStopFlag = true;
     const s = document.getElementById("mel-status");
     if (s) s.textContent = "⏹️ Detenido";
   });
