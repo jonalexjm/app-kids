@@ -141,6 +141,10 @@ function narrateText(text) {
   window.speechSynthesis.speak(utt);
 }
 
+function stopNarration() {
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+}
+
 function getMedal(pct) {
   if (pct >= 90) return { icon: "🥇", label: "Maestro Lector", color: "#f1c40f" };
   if (pct >= 70) return { icon: "🥈", label: "Gran Lector", color: "#bdc3c7" };
@@ -207,6 +211,7 @@ gameRenderers["conciencia-fonologica"] = function (area) {
             <div class="fono-word-display" style="margin:0 0 4px;">
               <span class="fono-word bounce">${item.word}</span>
               <button class="fono-audio-btn" id="fono-listen" title="Escuchar">🔊</button>
+              <button class="fono-audio-btn" id="fono-stop" title="Parar" style="background:#e74c3c;">⏹️</button>
             </div>
             <p class="fono-desc" style="margin:0;font-size:0.88rem;">${item.desc}</p>
           </div>
@@ -230,6 +235,7 @@ gameRenderers["conciencia-fonologica"] = function (area) {
     const optionsEl = document.getElementById("fono-options");
 
     document.getElementById("fono-listen").addEventListener("click", () => narrateText(item.word));
+    document.getElementById("fono-stop").addEventListener("click", stopNarration);
 
     optionsEl.addEventListener("click", (e) => {
       const btn = e.target.closest(".syllable-chip");
@@ -321,7 +327,10 @@ gameRenderers["lectura-silabica"] = function (area) {
         <div style="display:flex;align-items:center;gap:16px;margin:10px 0;background:${item.color};border-radius:16px;padding:12px 18px;border:2px solid rgba(0,0,0,0.07);">
           <div style="font-size:5.5rem;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,0.12);flex-shrink:0;">${item.emoji}</div>
           <div style="flex:1;">
-            <button class="fono-audio-btn" id="sil-listen" title="Escuchar la palabra" style="font-size:1.4rem;margin-bottom:6px;">🔊 Escuchar</button>
+            <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+              <button class="fono-audio-btn" id="sil-listen" title="Escuchar la palabra" style="font-size:1.4rem;">🔊 Escuchar</button>
+              <button class="fono-audio-btn" id="sil-stop" title="Parar" style="font-size:1.4rem;background:#e74c3c;">⏹️ Parar</button>
+            </div>
             <p class="fono-desc" style="margin:0;font-size:0.88rem;">${item.desc}</p>
           </div>
         </div>
@@ -347,6 +356,7 @@ gameRenderers["lectura-silabica"] = function (area) {
     setTimeout(() => narrateText(item.word), 400);
 
     document.getElementById("sil-listen").addEventListener("click", () => narrateText(item.word));
+    document.getElementById("sil-stop").addEventListener("click", stopNarration);
 
     const emptySlots = area.querySelectorAll(".syl-slot.empty");
     let currentSlot = 0;
@@ -447,7 +457,10 @@ gameRenderers["vocabulario-contextualizado"] = function (area) {
         <div style="display:flex;align-items:center;gap:16px;margin:10px 0;background:${wordData ? wordData.color : "#f0f4f8"};border-radius:16px;padding:12px 18px;border:2px solid rgba(0,0,0,0.07);">
           <div style="font-size:5.5rem;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,0.12);flex-shrink:0;">${wordData ? wordData.emoji : "🌿"}</div>
           <div style="flex:1;">
-            <button class="fono-audio-btn" id="vocab-listen" title="Escuchar" style="font-size:1.3rem;margin-bottom:6px;">🔊 Escuchar oración</button>
+            <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+              <button class="fono-audio-btn" id="vocab-listen" title="Escuchar" style="font-size:1.3rem;">🔊 Escuchar oración</button>
+              <button class="fono-audio-btn" id="vocab-stop" title="Parar" style="font-size:1.3rem;background:#e74c3c;">⏹️ Parar</button>
+            </div>
             ${wordData ? `<p class="fono-desc" style="margin:0;font-size:0.88rem;">Palabra clave: <strong>${wordData.word}</strong> (${wordData.syllables.join(" - ")})</p>` : ""}
           </div>
         </div>
@@ -467,6 +480,7 @@ gameRenderers["vocabulario-contextualizado"] = function (area) {
     const optionsEl = document.getElementById("vocab-options");
 
     document.getElementById("vocab-listen").addEventListener("click", () => narrateText(item.text));
+    document.getElementById("vocab-stop").addEventListener("click", stopNarration);
 
     shuffled.forEach((w) => {
       const btn = document.createElement("button");
@@ -605,7 +619,10 @@ gameRenderers["conteo-animado"] = function (area) {
           <span class="fono-badge">🔢 Conteo del 1 al 20</span>
           <span class="math-score">Puntaje: ${score} / ${maxRounds} | Ronda ${round + 1}</span>
         </div>
-        <button class="fono-audio-btn" id="conteo-listen" style="margin-bottom:10px;">🔊 Escuchar el conteo</button>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;">
+          <button class="fono-audio-btn" id="conteo-listen">🔊 Escuchar el conteo</button>
+          <button class="fono-audio-btn" id="conteo-stop" style="background:#e74c3c;">⏹️ Parar</button>
+        </div>
         <p class="fono-instruction">¿Cuántos objetos hay?</p>
         <div class="conteo-objects" id="conteo-objects">
           ${Array(count)
@@ -623,6 +640,7 @@ gameRenderers["conteo-animado"] = function (area) {
     const objs = area.querySelectorAll(".conteo-obj");
     objs.forEach((el, i) => setTimeout(() => el.classList.add("visible"), i * 80));
 
+    document.getElementById("conteo-stop").addEventListener("click", stopNarration);
     document.getElementById("conteo-listen").addEventListener("click", () => {
       narrateCount(count);
       objs.forEach((el, i) => {
@@ -812,7 +830,10 @@ gameRenderers["operaciones-campo"] = function (area) {
           <span class="fono-badge">${p.tool} Herramienta: ${p.toolName}</span>
           <span class="math-score">Puntaje: ${score} / ${pool.length} | Problema ${current + 1}</span>
         </div>
-        <button class="fono-audio-btn" id="campo-listen" style="margin-bottom:12px;">🔊 Escuchar problema</button>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px;">
+          <button class="fono-audio-btn" id="campo-listen">🔊 Escuchar problema</button>
+          <button class="fono-audio-btn" id="campo-stop" style="background:#e74c3c;">⏹️ Parar</button>
+        </div>
         <div class="campo-problem">
           <div class="campo-tool">${p.tool}</div>
           <p class="campo-text">${p.text.replace(/\n/g, "<br>")}</p>
@@ -826,6 +847,7 @@ gameRenderers["operaciones-campo"] = function (area) {
 
     setTimeout(() => narrateText(p.text.replace(/\n/g, " ")), 400);
     document.getElementById("campo-listen").addEventListener("click", () => narrateText(p.text.replace(/\n/g, " ")));
+    document.getElementById("campo-stop").addEventListener("click", stopNarration);
 
     area.querySelector(".multi-options").addEventListener("click", (e) => {
       const btn = e.target.closest(".option-btn");
@@ -1191,7 +1213,10 @@ gameRenderers["seres-vivos"] = function (area) {
           <span class="fono-badge">${isVivo ? "🌿 Seres Vivos" : "🌍 Medio Ambiente"}</span>
           <span class="math-score">Puntaje: ${score} | ${roundIdx + 1}/2 · Ítem ${itemIdx + 1}/${items.length}</span>
         </div>
-        <button class="fono-audio-btn" id="sv-listen" style="margin-bottom:10px;">🔊 Escuchar</button>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;">
+          <button class="fono-audio-btn" id="sv-listen">🔊 Escuchar</button>
+          <button class="fono-audio-btn" id="sv-stop" style="background:#e74c3c;">⏹️ Parar</button>
+        </div>
         <div class="seres-item bounce">${item.label}</div>
         <p class="fono-instruction">${isVivo ? "¿Es un ser vivo?" : "¿Es una buena acción para el medio ambiente?"}</p>
         <div class="seres-btns">
@@ -1207,6 +1232,7 @@ gameRenderers["seres-vivos"] = function (area) {
     document
       .getElementById("sv-listen")
       .addEventListener("click", () => narrateText(item.label.replace(/[^\w\s]/gi, "") + ". " + item.reason));
+    document.getElementById("sv-stop").addEventListener("click", stopNarration);
 
     function answer(chose) {
       const fb = document.getElementById("sv-feedback");
@@ -1276,7 +1302,10 @@ gameRenderers["clasifica-animales"] = function (area) {
           <span class="fono-badge">🦁 Clasifica los Animales</span>
           <span class="math-score">Puntaje: ${score} / ${pool.length} | Animal ${current + 1}</span>
         </div>
-        <button class="fono-audio-btn" id="cls-listen" style="margin-bottom:8px;">🔊 Escuchar</button>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;">
+          <button class="fono-audio-btn" id="cls-listen">🔊 Escuchar</button>
+          <button class="fono-audio-btn" id="cls-stop" style="background:#e74c3c;">⏹️ Parar</button>
+        </div>
         <div class="clasifica-animal bounce">${animal.emoji}</div>
         <p class="clasifica-name">${animal.name}</p>
         <p class="fono-instruction">¿A qué categoría pertenece?</p>
@@ -1297,6 +1326,7 @@ gameRenderers["clasifica-animales"] = function (area) {
     document
       .getElementById("cls-listen")
       .addEventListener("click", () => narrateText(`${animal.name}. ¿Es un mamífero, ave, reptil, anfibio o insecto?`));
+    document.getElementById("cls-stop").addEventListener("click", stopNarration);
 
     document.getElementById("cls-cats").addEventListener("click", (e) => {
       const btn = e.target.closest(".cat-btn");
@@ -1469,7 +1499,10 @@ gameRenderers["cuerpo-humano"] = function (area) {
           <span class="fono-badge">🫀 ${part.system}</span>
           <span class="math-score">Puntaje: ${score} / ${pool.length} | Parte ${current + 1}</span>
         </div>
-        <button class="fono-audio-btn" id="cb-listen" style="margin-bottom:8px;">🔊 Escuchar</button>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;">
+          <button class="fono-audio-btn" id="cb-listen">🔊 Escuchar</button>
+          <button class="fono-audio-btn" id="cb-stop" style="background:#e74c3c;">⏹️ Parar</button>
+        </div>
         <div class="cuerpo-layout">
           <div class="cuerpo-svg">${getBodySvg(part.name)}</div>
           <div class="cuerpo-info">
@@ -1488,6 +1521,7 @@ gameRenderers["cuerpo-humano"] = function (area) {
 
     setTimeout(() => narrateText(`${part.position}. ¿Qué parte del cuerpo es?`), 400);
     document.getElementById("cb-listen").addEventListener("click", () => narrateText(`${part.position}. ${part.fact}`));
+    document.getElementById("cb-stop").addEventListener("click", stopNarration);
 
     document.getElementById("cb-options").addEventListener("click", (e) => {
       const btn = e.target.closest(".option-btn");
@@ -1759,7 +1793,10 @@ gameRenderers["galeria-territorio"] = function (area) {
           <div class="galeria-relato">
             <p>${place.relato}</p>
           </div>
-          <button class="galeria-audio-btn" id="gal-audio">🔊 Escuchar Audiorelato</button>
+          <div style="display:flex;gap:6px;align-items:center;justify-content:center;">
+            <button class="galeria-audio-btn" id="gal-audio">🔊 Escuchar Audiorelato</button>
+            <button class="galeria-audio-btn" id="gal-stop" style="background:#e74c3c;">⏹️ Parar</button>
+          </div>
         </div>
         <div class="galeria-nav">
           <button class="game-btn" id="gal-prev" ${current === 0 ? "disabled style='opacity:0.4;cursor:default;'" : ""}>◀ Anterior</button>
@@ -1774,6 +1811,7 @@ gameRenderers["galeria-territorio"] = function (area) {
     document.getElementById("gal-audio").addEventListener("click", () => {
       narrateText(place.name + ". " + place.relato);
     });
+    document.getElementById("gal-stop").addEventListener("click", stopNarration);
     document.getElementById("gal-prev").addEventListener("click", () => {
       if (current > 0) {
         current--;
@@ -2192,12 +2230,15 @@ gameRenderers["ritmo-musical"] = function (area) {
   ];
   let level = 0,
     score = 0;
+  let ritmoStopFlag = false;
 
   function playPattern(pattern) {
+    ritmoStopFlag = false;
     const ms = 60000 / pattern.bpm / 2;
     pattern.beats.forEach((beat, i) => {
       if (!beat) return;
       setTimeout(() => {
+        if (ritmoStopFlag) return;
         artBeep(pattern.freqs[i % pattern.freqs.length], 0.15, "triangle", 0.5);
         const dots = document.querySelectorAll(".ritmo-dot");
         if (dots[i]) {
@@ -2241,7 +2282,10 @@ gameRenderers["ritmo-musical"] = function (area) {
         <div style="display:flex;gap:8px;justify-content:center;margin:10px 0;flex-wrap:wrap;">
           ${pat.beats.map((b) => `<div class="ritmo-dot" style="width:28px;height:28px;border-radius:50%;background:${b ? "#e74c3c" : "#ddd"};border:2px solid ${b ? "#c0392b" : "#bbb"};transition:all 0.12s;opacity:${b ? "0.7" : "0.4"};"></div>`).join("")}
         </div>
-        <button id="ritmo-play" class="game-btn" style="display:block;margin:0 auto 14px;">▶️ Escuchar Ritmo</button>
+        <div style="display:flex;gap:6px;justify-content:center;margin-bottom:14px;">
+          <button id="ritmo-play" class="game-btn">▶️ Escuchar Ritmo</button>
+          <button id="ritmo-stop" class="game-btn" style="background:#e74c3c;">⏹️ Parar</button>
+        </div>
         <div class="multi-options" style="justify-content:center;">
           ${options.map((o) => `<button class="option-btn ritmo-opt" data-val="${o.name}">${o.name}</button>`).join("")}
         </div>
@@ -2249,6 +2293,9 @@ gameRenderers["ritmo-musical"] = function (area) {
       </div>`;
 
     document.getElementById("ritmo-play").addEventListener("click", () => playPattern(pat));
+    document.getElementById("ritmo-stop").addEventListener("click", () => {
+      ritmoStopFlag = true;
+    });
     setTimeout(() => playPattern(pat), 500);
 
     area.querySelector(".multi-options").addEventListener("click", (e) => {
@@ -2365,12 +2412,14 @@ gameRenderers["danza-cauca"] = function (area) {
         </div>
         <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
           <button id="danza-narrar" class="game-btn" style="background:#9b59b6;">🔊 Escuchar</button>
+          <button id="danza-stop" class="game-btn" style="background:#e74c3c;">⏹️ Parar</button>
           <button id="danza-quiz" class="game-btn">Pregunta ➡️</button>
         </div>
       </div>`;
     document.getElementById("danza-narrar").addEventListener("click", () => {
       narrateText(`${d.name}. ${d.desc}. Sus instrumentos son: ${d.instrumentos}.`);
     });
+    document.getElementById("danza-stop").addEventListener("click", stopNarration);
     setTimeout(() => narrateText(`${d.name}. ${d.desc}`), 300);
     document.getElementById("danza-quiz").addEventListener("click", () => {
       renderQuiz();
@@ -3065,7 +3114,10 @@ gameRenderers["festival-artesanias"] = function (area) {
             <div style="font-size:1.8rem;">${item.icon}</div>
             <strong style="font-size:0.85rem;color:#333;">${item.title}</strong>
             <p style="font-size:0.78rem;color:#666;margin:0;line-height:1.4;">${item.desc}</p>
-            <button class="game-btn narrar-btn" data-text="${item.title}. ${item.desc}" style="padding:2px 8px;font-size:0.74rem;background:#3498db;margin-top:4px;align-self:flex-start;">🔊 Escuchar</button>
+            <div style="display:flex;gap:4px;margin-top:4px;">
+              <button class="game-btn narrar-btn" data-text="${item.title}. ${item.desc}" style="padding:2px 8px;font-size:0.74rem;background:#3498db;">🔊 Escuchar</button>
+              <button class="game-btn parar-narrar" style="padding:2px 8px;font-size:0.74rem;background:#e74c3c;">⏹️ Parar</button>
+            </div>
           </div>`,
           )
           .join("")}
@@ -3074,6 +3126,8 @@ gameRenderers["festival-artesanias"] = function (area) {
     content.addEventListener("click", (e) => {
       const btn = e.target.closest(".narrar-btn");
       if (btn) narrateText(btn.dataset.text);
+      const stopBtn = e.target.closest(".parar-narrar");
+      if (stopBtn) stopNarration();
     });
   }
 
