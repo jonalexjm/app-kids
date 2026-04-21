@@ -29,19 +29,19 @@ const menuConfig = [
     icon: "🔢",
     games: [
       {
-        id: "suma-resta",
-        label: "Suma y Resta",
-        desc: "Resuelve operaciones de suma y resta lo más rápido que puedas.",
+        id: "conteo-animado",
+        label: "Conteo Animado",
+        desc: "Cuenta objetos animados del 1 al 20 con pistas sonoras y de conteo.",
       },
       {
-        id: "multiplicacion",
-        label: "Multiplicación",
-        desc: "Practica las tablas de multiplicar con ejercicios divertidos.",
+        id: "operaciones-campo",
+        label: "Operaciones de Campo",
+        desc: "Resuelve sumas, restas y más con herramientas y situaciones del campo.",
       },
       {
-        id: "figuras-geometricas",
-        label: "Figuras Geométricas",
-        desc: "Identifica y aprende sobre las figuras geométricas.",
+        id: "rompecabezas-geometrico",
+        label: "Rompecabezas Geométrico",
+        desc: "Identifica y arma figuras geométricas con sus piezas.",
       },
     ],
   },

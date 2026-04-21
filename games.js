@@ -448,193 +448,592 @@ gameRenderers["vocabulario-contextualizado"] = function (area) {
 // ║  MATEMÁTICAS                                                    ║
 // ╚══════════════════════════════════════════════════════════════════╝
 
-// ── Suma y Resta ─────────────────────────────────────────────────────────────
-gameRenderers["suma-resta"] = function (area) {
-  let score = 0,
-    total = 0,
-    maxRounds = 10;
+// ── Utilidad: medalla matemáticas ────────────────────────────────────────────
+function renderMathMedal(score, total, area, gameId) {
+  const pct = Math.round((score / total) * 100);
+  const medal = getMedal(pct);
+  area.innerHTML = `
+    <div class="game-result medal-result fadeIn">
+      <div class="medal-badge bounce" style="font-size:4rem;">${medal.icon}</div>
+      <h2 style="color:${medal.color};">¡${medal.label}!</h2>
+      <p>Respuestas correctas: <strong>${score}</strong> de <strong>${total}</strong> (${pct}%)</p>
+      <div class="medal-stars">${"⭐".repeat(Math.ceil(pct / 25))}</div>
+      <button class="game-btn" onclick="gameRenderers['${gameId}'](this.closest('.game-area'))">Jugar de nuevo</button>
+    </div>`;
+  narrateText(`¡Felicidades! Obtuviste ${score} de ${total} puntos`);
+}
 
-  function nextRound() {
-    if (total >= maxRounds) {
-      area.innerHTML = `<div class="game-result"><h2>🎉 ¡Terminaste!</h2><p>Puntaje: ${score} / ${maxRounds}</p><button class="game-btn" onclick="gameRenderers['suma-resta'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
-      return;
-    }
-    const a = Math.floor(Math.random() * 50) + 1;
-    const b = Math.floor(Math.random() * 50) + 1;
-    const isSum = Math.random() > 0.5;
-    const op = isSum ? "+" : "-";
-    const nums = isSum ? [a, b] : [Math.max(a, b), Math.min(a, b)];
-    const answer = isSum ? nums[0] + nums[1] : nums[0] - nums[1];
+// ── 1. Conteo Animado (1–20) ──────────────────────────────────────────────────
+gameRenderers["conteo-animado"] = function (area) {
+  const OBJECTS = ["🌽", "🐔", "🐑", "🌻", "🦋", "🍎", "🐝", "🌺", "🐠", "🦜", "🌿", "🍇", "🥕", "🐰", "🌸"];
+  const NUMBERS_ES = [
+    "uno",
+    "dos",
+    "tres",
+    "cuatro",
+    "cinco",
+    "seis",
+    "siete",
+    "ocho",
+    "nueve",
+    "diez",
+    "once",
+    "doce",
+    "trece",
+    "catorce",
+    "quince",
+    "dieciséis",
+    "diecisiete",
+    "dieciocho",
+    "diecinueve",
+    "veinte",
+  ];
+  let round = 0,
+    score = 0,
+    maxRounds = 8;
 
-    area.innerHTML = `
-      <div class="math-container">
-        <p class="math-score">Puntaje: ${score} / ${maxRounds} &nbsp;|&nbsp; Pregunta ${total + 1}</p>
-        <div class="math-problem">${nums[0]} ${op} ${nums[1]} = ?</div>
-        <input type="number" id="math-input" class="math-input" autofocus>
-        <button id="math-check" class="game-btn">Responder</button>
-        <p id="math-feedback" class="math-feedback"></p>
-      </div>`;
-
-    const input = document.getElementById("math-input");
-    const check = document.getElementById("math-check");
-    const feedback = document.getElementById("math-feedback");
-    input.focus();
-
-    function verify() {
-      const val = parseInt(input.value, 10);
-      total++;
-      if (val === answer) {
-        score++;
-        feedback.textContent = "✅ ¡Correcto!";
-        feedback.style.color = "#2ecc71";
-      } else {
-        feedback.textContent = `❌ La respuesta era ${answer}`;
-        feedback.style.color = "#e74c3c";
-      }
-      setTimeout(nextRound, 1000);
-    }
-    check.addEventListener("click", verify);
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") verify();
-    });
+  function narrateCount(n) {
+    const words = Array.from({ length: n }, (_, i) => NUMBERS_ES[i]).join(", ");
+    narrateText(words);
   }
-  nextRound();
-};
-
-// ── Multiplicación ───────────────────────────────────────────────────────────
-gameRenderers["multiplicacion"] = function (area) {
-  let score = 0,
-    total = 0,
-    maxRounds = 10;
 
   function nextRound() {
-    if (total >= maxRounds) {
-      area.innerHTML = `<div class="game-result"><h2>🎉 ¡Terminaste!</h2><p>Puntaje: ${score} / ${maxRounds}</p><button class="game-btn" onclick="gameRenderers['multiplicacion'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
+    if (round >= maxRounds) {
+      renderMathMedal(score, maxRounds, area, "conteo-animado");
       return;
     }
-    const a = Math.floor(Math.random() * 10) + 1;
-    const b = Math.floor(Math.random() * 10) + 1;
-    const answer = a * b;
+    const count = Math.floor(Math.random() * 20) + 1;
+    const obj = OBJECTS[Math.floor(Math.random() * OBJECTS.length)];
 
-    // Generar opciones
-    const opts = new Set([answer]);
-    while (opts.size < 4) opts.add(Math.floor(Math.random() * 100) + 1);
-    const options = [...opts].sort(() => Math.random() - 0.5);
+    const opts = new Set([count]);
+    let att = 0;
+    while (opts.size < 4 && att < 300) {
+      const d = count + Math.floor(Math.random() * 7) - 3;
+      if (d >= 1 && d <= 20) opts.add(d);
+      att++;
+    }
+    let n = 1;
+    while (opts.size < 4) {
+      if (!opts.has(n)) opts.add(n);
+      n++;
+    }
+    const options = [...opts].sort((a, b) => a - b);
 
     area.innerHTML = `
-      <div class="math-container">
-        <p class="math-score">Puntaje: ${score} / ${maxRounds} &nbsp;|&nbsp; Pregunta ${total + 1}</p>
-        <div class="math-problem">${a} × ${b} = ?</div>
-        <div class="multi-options" id="multi-options">
+      <div class="conteo-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">🔢 Conteo del 1 al 20</span>
+          <span class="math-score">Puntaje: ${score} / ${maxRounds} | Ronda ${round + 1}</span>
+        </div>
+        <button class="fono-audio-btn" id="conteo-listen" style="margin-bottom:10px;">🔊 Escuchar el conteo</button>
+        <p class="fono-instruction">¿Cuántos objetos hay?</p>
+        <div class="conteo-objects" id="conteo-objects">
+          ${Array(count)
+            .fill(0)
+            .map((_, i) => `<span class="conteo-obj" style="animation-delay:${i * 0.07}s">${obj}</span>`)
+            .join("")}
+        </div>
+        <div class="conteo-hint" id="conteo-hint"></div>
+        <div class="multi-options" style="margin-top:16px;">
           ${options.map((o) => `<button class="option-btn" data-val="${o}">${o}</button>`).join("")}
         </div>
-        <p id="math-feedback" class="math-feedback"></p>
+        <p id="conteo-feedback" class="math-feedback"></p>
       </div>`;
 
-    document.getElementById("multi-options").addEventListener("click", (e) => {
+    const objs = area.querySelectorAll(".conteo-obj");
+    objs.forEach((el, i) => setTimeout(() => el.classList.add("visible"), i * 80));
+
+    document.getElementById("conteo-listen").addEventListener("click", () => {
+      narrateCount(count);
+      objs.forEach((el, i) => {
+        setTimeout(() => {
+          objs.forEach((e) => e.classList.remove("counting"));
+          el.classList.add("counting");
+          const hint = document.getElementById("conteo-hint");
+          if (hint) hint.textContent = NUMBERS_ES[i].toUpperCase();
+        }, i * 650);
+      });
+    });
+
+    area.querySelector(".multi-options").addEventListener("click", (e) => {
       const btn = e.target.closest(".option-btn");
       if (!btn) return;
-      total++;
-      const feedback = document.getElementById("math-feedback");
-      if (parseInt(btn.dataset.val) === answer) {
+      const val = parseInt(btn.dataset.val);
+      const fb = document.getElementById("conteo-feedback");
+      round++;
+      if (val === count) {
         score++;
         btn.style.background = "#2ecc71";
-        feedback.textContent = "✅ ¡Correcto!";
-        feedback.style.color = "#2ecc71";
+        fb.textContent = `✅ ¡Correcto! Hay ${count} ${obj} (${NUMBERS_ES[count - 1]})`;
+        fb.style.color = "#2ecc71";
+        narrateText(`¡Muy bien! Hay ${count}, ${NUMBERS_ES[count - 1]}`);
       } else {
         btn.style.background = "#e74c3c";
-        feedback.textContent = `❌ La respuesta era ${answer}`;
-        feedback.style.color = "#e74c3c";
+        fb.textContent = `❌ Eran ${count} ${obj} — ${NUMBERS_ES[count - 1]}`;
+        fb.style.color = "#e74c3c";
+        narrateText(`Son ${count}, ${NUMBERS_ES[count - 1]}`);
       }
-      document.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
-      setTimeout(nextRound, 1000);
+      area.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
+      setTimeout(nextRound, 1800);
     });
   }
   nextRound();
 };
 
-// ── Figuras Geométricas ──────────────────────────────────────────────────────
-gameRenderers["figuras-geometricas"] = function (area) {
-  const figures = [
+// ── 2. Operaciones de Campo ───────────────────────────────────────────────────
+gameRenderers["operaciones-campo"] = function (area) {
+  const templates = [
     {
-      name: "Círculo",
-      svg: `<svg viewBox="0 0 100 100" width="120" height="120"><circle cx="50" cy="50" r="45" fill="#6c5ce7"/></svg>`,
-      sides: "0 lados",
+      text: "Tienes {a} 🌽 mazorcas y recoges {b} más.\n¿Cuántas tienes ahora?",
+      op: "+",
+      minA: 1,
+      maxA: 10,
+      minB: 1,
+      maxB: 10,
+      tool: "⚖️",
+      toolName: "Báscula",
     },
     {
-      name: "Triángulo",
-      svg: `<svg viewBox="0 0 100 100" width="120" height="120"><polygon points="50,5 95,95 5,95" fill="#e17055"/></svg>`,
-      sides: "3 lados",
+      text: "Hay {a} 🐔 gallinas en el corral. Se van {b}.\n¿Cuántas quedan?",
+      op: "-",
+      minA: 6,
+      maxA: 15,
+      minB: 1,
+      maxB: 5,
+      tool: "📏",
+      toolName: "Metro",
     },
     {
-      name: "Cuadrado",
-      svg: `<svg viewBox="0 0 100 100" width="120" height="120"><rect x="10" y="10" width="80" height="80" fill="#00b894"/></svg>`,
-      sides: "4 lados iguales",
+      text: "Hay {a} filas de 🌾 con {b} plantas cada una.\n¿Cuántas plantas hay en total?",
+      op: "×",
+      minA: 2,
+      maxA: 5,
+      minB: 2,
+      maxB: 5,
+      tool: "🚜",
+      toolName: "Tractor",
     },
     {
-      name: "Rectángulo",
-      svg: `<svg viewBox="0 0 140 100" width="140" height="100"><rect x="5" y="15" width="130" height="70" fill="#0984e3"/></svg>`,
-      sides: "4 lados, 2 pares iguales",
+      text: "Cosechaste {a} 🥕 para repartir en {b} canastos iguales.\n¿Cuántas van en cada canasto?",
+      op: "÷",
+      minBmult: 2,
+      maxBmult: 4,
+      tool: "🧺",
+      toolName: "Canasto",
     },
     {
-      name: "Pentágono",
-      svg: `<svg viewBox="0 0 100 100" width="120" height="120"><polygon points="50,5 97,38 79,92 21,92 3,38" fill="#fdcb6e"/></svg>`,
-      sides: "5 lados",
+      text: "Un surco mide {a} pasos. Ya caminaste {b}.\n¿Cuántos pasos faltan?",
+      op: "-",
+      minA: 8,
+      maxA: 18,
+      minB: 2,
+      maxB: 7,
+      tool: "📏",
+      toolName: "Metro",
     },
     {
-      name: "Hexágono",
-      svg: `<svg viewBox="0 0 100 100" width="120" height="120"><polygon points="50,2 93,25 93,75 50,98 7,75 7,25" fill="#e84393"/></svg>`,
-      sides: "6 lados",
+      text: "Llenaste {a} 🪣 baldes con {b} litros cada uno.\n¿Cuántos litros en total?",
+      op: "×",
+      minA: 2,
+      maxA: 6,
+      minB: 2,
+      maxB: 4,
+      tool: "🪣",
+      toolName: "Balde",
+    },
+    {
+      text: "Tienes {a} 🌱 semillas y sembraste {b}.\n¿Cuántas te quedan?",
+      op: "-",
+      minA: 10,
+      maxA: 20,
+      minB: 1,
+      maxB: 9,
+      tool: "🌱",
+      toolName: "Semillero",
+    },
+    {
+      text: "El 🌡️ marcó {a}°C en la mañana y subió {b}°C.\n¿Cuánto marca ahora?",
+      op: "+",
+      minA: 10,
+      maxA: 20,
+      minB: 1,
+      maxB: 9,
+      tool: "🌡️",
+      toolName: "Termómetro",
+    },
+    {
+      text: "Tienes {a} 🍎 para poner en {b} cajas iguales.\n¿Cuántas van en cada caja?",
+      op: "÷",
+      minBmult: 2,
+      maxBmult: 5,
+      tool: "📦",
+      toolName: "Caja",
+    },
+    {
+      text: "Plantaste {a} 🌿 matas en la mañana y {b} en la tarde.\n¿Cuántas plantaste en total?",
+      op: "+",
+      minA: 3,
+      maxA: 12,
+      minB: 3,
+      maxB: 12,
+      tool: "🌿",
+      toolName: "Palín",
+    },
+  ];
+
+  const pool = shuffle([...templates]).slice(0, 8);
+  let current = 0,
+    score = 0;
+
+  function buildProblem(tmpl) {
+    let a, b, answer;
+    if (tmpl.op === "÷") {
+      b = Math.floor(Math.random() * (tmpl.maxBmult - tmpl.minBmult + 1)) + tmpl.minBmult;
+      const mult = Math.floor(Math.random() * 4) + 2;
+      a = b * mult;
+      answer = mult;
+    } else {
+      a = Math.floor(Math.random() * (tmpl.maxA - tmpl.minA + 1)) + tmpl.minA;
+      b = Math.floor(Math.random() * (tmpl.maxB - tmpl.minB + 1)) + tmpl.minB;
+      if (tmpl.op === "-" && b > a) [a, b] = [b, a];
+      if (tmpl.op === "+") answer = a + b;
+      if (tmpl.op === "-") answer = a - b;
+      if (tmpl.op === "×") answer = a * b;
+    }
+    const text = tmpl.text.replace("{a}", a).replace("{b}", b);
+    return { text, answer, op: tmpl.op, tool: tmpl.tool, toolName: tmpl.toolName };
+  }
+
+  function render() {
+    if (current >= pool.length) {
+      renderMathMedal(score, pool.length, area, "operaciones-campo");
+      return;
+    }
+    const p = buildProblem(pool[current]);
+
+    const opts = new Set([p.answer]);
+    let att = 0;
+    while (opts.size < 4 && att < 300) {
+      const d = p.answer + Math.floor(Math.random() * 9) - 4;
+      if (d >= 0) opts.add(d);
+      att++;
+    }
+    let n = 0;
+    while (opts.size < 4) {
+      if (!opts.has(n)) opts.add(n);
+      n++;
+    }
+    const options = [...opts].sort((a, b) => a - b);
+    const opNames = { "+": "suma ➕", "-": "resta ➖", "×": "multiplicación ✖️", "÷": "división ➗" };
+
+    area.innerHTML = `
+      <div class="campo-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">${p.tool} Herramienta: ${p.toolName}</span>
+          <span class="math-score">Puntaje: ${score} / ${pool.length} | Problema ${current + 1}</span>
+        </div>
+        <button class="fono-audio-btn" id="campo-listen" style="margin-bottom:12px;">🔊 Escuchar problema</button>
+        <div class="campo-problem">
+          <div class="campo-tool">${p.tool}</div>
+          <p class="campo-text">${p.text.replace(/\n/g, "<br>")}</p>
+          <div class="campo-op-badge">${opNames[p.op]}</div>
+        </div>
+        <div class="multi-options" style="margin-top:20px;">
+          ${options.map((o) => `<button class="option-btn" data-val="${o}">${o}</button>`).join("")}
+        </div>
+        <p id="campo-feedback" class="math-feedback"></p>
+      </div>`;
+
+    setTimeout(() => narrateText(p.text.replace(/\n/g, " ")), 400);
+    document.getElementById("campo-listen").addEventListener("click", () => narrateText(p.text.replace(/\n/g, " ")));
+
+    area.querySelector(".multi-options").addEventListener("click", (e) => {
+      const btn = e.target.closest(".option-btn");
+      if (!btn) return;
+      const val = parseInt(btn.dataset.val);
+      const fb = document.getElementById("campo-feedback");
+      if (val === p.answer) {
+        score++;
+        btn.style.background = "#2ecc71";
+        fb.textContent = `✅ ¡Correcto! La respuesta es ${p.answer}`;
+        fb.style.color = "#2ecc71";
+        narrateText(`¡Muy bien! La respuesta es ${p.answer}`);
+      } else {
+        btn.style.background = "#e74c3c";
+        fb.textContent = `❌ La respuesta era ${p.answer}`;
+        fb.style.color = "#e74c3c";
+        narrateText(`La respuesta correcta es ${p.answer}`);
+      }
+      area.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
+      current++;
+      setTimeout(render, 1800);
+    });
+  }
+  render();
+};
+
+// ── 3. Rompecabezas Geométrico ────────────────────────────────────────────────
+gameRenderers["rompecabezas-geometrico"] = function (area) {
+  const puzzles = [
+    {
+      name: "Casa",
+      emoji: "🏠",
+      description: "Techo triangular + paredes rectangulares + puerta cuadrada",
+      targetSvg: `<svg width="150" height="160" viewBox="0 0 100 130">
+        <rect x="15" y="55" width="70" height="60" fill="#f8d7a0" stroke="#e67e22" stroke-width="2"/>
+        <polygon points="50,5 95,55 5,55" fill="#e17055" stroke="#c0392b" stroke-width="2"/>
+        <rect x="38" y="80" width="24" height="35" fill="#a29bfe" stroke="#6c5ce7" stroke-width="2"/>
+      </svg>`,
+      correctPieces: ["Triángulo", "Rectángulo", "Cuadrado"],
+      allPieces: [
+        {
+          name: "Triángulo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,5 95,95 5,95" fill="#e17055"/></svg>`,
+          correct: true,
+        },
+        {
+          name: "Rectángulo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><rect x="10" y="25" width="80" height="50" fill="#f8d7a0" stroke="#e67e22" stroke-width="3"/></svg>`,
+          correct: true,
+        },
+        {
+          name: "Cuadrado",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><rect x="25" y="55" width="50" height="45" fill="#a29bfe" stroke="#6c5ce7" stroke-width="3"/></svg>`,
+          correct: true,
+        },
+        {
+          name: "Círculo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#0984e3"/></svg>`,
+          correct: false,
+        },
+        {
+          name: "Hexágono",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,2 93,25 93,75 50,98 7,75 7,25" fill="#e84393"/></svg>`,
+          correct: false,
+        },
+      ],
+    },
+    {
+      name: "Cohete",
+      emoji: "🚀",
+      description: "Nariz triangular + cuerpo rectangular + aletas triangulares",
+      targetSvg: `<svg width="120" height="160" viewBox="0 0 80 140">
+        <polygon points="40,2 20,40 60,40" fill="#e17055" stroke="#c0392b" stroke-width="2"/>
+        <rect x="20" y="40" width="40" height="70" fill="#6c5ce7" stroke="#5a4bd1" stroke-width="2"/>
+        <polygon points="20,70 4,108 20,108" fill="#fdcb6e" stroke="#f39c12" stroke-width="2"/>
+        <polygon points="60,70 76,108 60,108" fill="#fdcb6e" stroke="#f39c12" stroke-width="2"/>
+      </svg>`,
+      correctPieces: ["Triángulo", "Rectángulo"],
+      allPieces: [
+        {
+          name: "Triángulo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,5 95,95 5,95" fill="#e17055"/></svg>`,
+          correct: true,
+        },
+        {
+          name: "Rectángulo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><rect x="20" y="10" width="60" height="80" fill="#6c5ce7" stroke="#5a4bd1" stroke-width="3"/></svg>`,
+          correct: true,
+        },
+        {
+          name: "Pentágono",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,5 97,38 79,92 21,92 3,38" fill="#fdcb6e"/></svg>`,
+          correct: false,
+        },
+        {
+          name: "Círculo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#2ecc71"/></svg>`,
+          correct: false,
+        },
+        {
+          name: "Hexágono",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,2 93,25 93,75 50,98 7,75 7,25" fill="#e84393"/></svg>`,
+          correct: false,
+        },
+      ],
+    },
+    {
+      name: "Pez",
+      emoji: "🐠",
+      description: "Cuerpo ovalado + cola triangular",
+      targetSvg: `<svg width="170" height="110" viewBox="0 0 160 100">
+        <ellipse cx="75" cy="50" rx="55" ry="34" fill="#0984e3" stroke="#0769b3" stroke-width="2"/>
+        <polygon points="130,20 158,50 130,80" fill="#00b894" stroke="#00a381" stroke-width="2"/>
+        <circle cx="45" cy="38" r="7" fill="#fff"/>
+        <circle cx="45" cy="38" r="4" fill="#1a1a1a"/>
+      </svg>`,
+      correctPieces: ["Elipse", "Triángulo"],
+      allPieces: [
+        {
+          name: "Elipse",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="45" ry="28" fill="#0984e3"/></svg>`,
+          correct: true,
+        },
+        {
+          name: "Triángulo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,5 95,95 5,95" fill="#00b894"/></svg>`,
+          correct: true,
+        },
+        {
+          name: "Cuadrado",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="#e17055"/></svg>`,
+          correct: false,
+        },
+        {
+          name: "Hexágono",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,2 93,25 93,75 50,98 7,75 7,25" fill="#e84393"/></svg>`,
+          correct: false,
+        },
+      ],
+    },
+    {
+      name: "Sol",
+      emoji: "☀️",
+      description: "Centro circular + rayos triangulares",
+      targetSvg: `<svg width="150" height="150" viewBox="0 0 120 120">
+        <polygon points="60,2 68,40 95,15 72,42 110,38 75,55 108,72 70,62 80,100 58,70 42,105 50,65 12,80 48,58 8,38 46,48 22,15 55,42" fill="#fdcb6e" stroke="#f39c12" stroke-width="1"/>
+        <circle cx="60" cy="60" r="28" fill="#ffeaa7" stroke="#f39c12" stroke-width="2"/>
+      </svg>`,
+      correctPieces: ["Círculo", "Triángulo"],
+      allPieces: [
+        {
+          name: "Círculo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#ffeaa7" stroke="#f39c12" stroke-width="4"/></svg>`,
+          correct: true,
+        },
+        {
+          name: "Triángulo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,5 95,95 5,95" fill="#fdcb6e"/></svg>`,
+          correct: true,
+        },
+        {
+          name: "Rectángulo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><rect x="10" y="25" width="80" height="50" fill="#6c5ce7"/></svg>`,
+          correct: false,
+        },
+        {
+          name: "Pentágono",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,5 97,38 79,92 21,92 3,38" fill="#e84393"/></svg>`,
+          correct: false,
+        },
+      ],
+    },
+    {
+      name: "Árbol",
+      emoji: "🌲",
+      description: "Copa triangular (doble) + tronco rectangular",
+      targetSvg: `<svg width="130" height="160" viewBox="0 0 100 130">
+        <polygon points="50,5 90,65 10,65" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+        <polygon points="50,38 88,95 12,95" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+        <rect x="38" y="90" width="24" height="35" fill="#a0522d" stroke="#7a3f1e" stroke-width="2"/>
+      </svg>`,
+      correctPieces: ["Triángulo", "Rectángulo"],
+      allPieces: [
+        {
+          name: "Triángulo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,5 95,95 5,95" fill="#2ecc71"/></svg>`,
+          correct: true,
+        },
+        {
+          name: "Rectángulo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><rect x="30" y="10" width="40" height="80" fill="#a0522d" stroke="#7a3f1e" stroke-width="3"/></svg>`,
+          correct: true,
+        },
+        {
+          name: "Círculo",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#0984e3"/></svg>`,
+          correct: false,
+        },
+        {
+          name: "Hexágono",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,2 93,25 93,75 50,98 7,75 7,25" fill="#e84393"/></svg>`,
+          correct: false,
+        },
+        {
+          name: "Pentágono",
+          svg: `<svg width="56" height="56" viewBox="0 0 100 100"><polygon points="50,5 97,38 79,92 21,92 3,38" fill="#fdcb6e"/></svg>`,
+          correct: false,
+        },
+      ],
     },
   ];
 
   let current = 0,
     score = 0;
 
-  function shuffle(a) {
-    const b = [...a];
-    for (let i = b.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [b[i], b[j]] = [b[j], b[i]];
-    }
-    return b;
-  }
-
   function render() {
-    if (current >= figures.length) {
-      area.innerHTML = `<div class="game-result"><h2>🎉 ¡Terminaste!</h2><p>Puntaje: ${score} / ${figures.length}</p><button class="game-btn" onclick="gameRenderers['figuras-geometricas'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
+    if (current >= puzzles.length) {
+      renderMathMedal(score, puzzles.length, area, "rompecabezas-geometrico");
       return;
     }
-    const fig = figures[current];
-    const names = shuffle(figures.map((f) => f.name));
+    const puz = puzzles[current];
+    const shuffledPieces = shuffle([...puz.allPieces]);
+    const selectedPieces = new Set();
 
     area.innerHTML = `
-      <div class="figuras-container">
-        <p class="math-score">Puntaje: ${score} / ${figures.length} &nbsp;|&nbsp; Figura ${current + 1}</p>
-        <div class="figuras-svg">${fig.svg}</div>
-        <p style="margin:8px 0;color:#888;">${fig.sides}</p>
-        <p style="font-weight:bold;margin-bottom:12px;">¿Qué figura es?</p>
-        <div class="multi-options">${names.map((n) => `<button class="option-btn" data-val="${n}">${n}</button>`).join("")}</div>
-        <p id="fig-feedback" class="math-feedback"></p>
+      <div class="rompe-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">🔷 Rompecabezas ${current + 1} / ${puzzles.length}</span>
+          <span class="math-score">Puntaje: ${score} / ${puzzles.length}</span>
+        </div>
+        <p class="fono-instruction">Figura: <strong>${puz.name} ${puz.emoji}</strong></p>
+        <p class="fono-desc">${puz.description}</p>
+        <div class="rompe-target">${puz.targetSvg}</div>
+        <p class="fono-instruction" style="margin-top:14px;">Selecciona las piezas que forman esta figura:</p>
+        <div class="rompe-pieces" id="rompe-pieces">
+          ${shuffledPieces
+            .map(
+              (p, i) => `
+            <div class="rompe-piece" data-idx="${i}" data-correct="${p.correct}">
+              ${p.svg}
+              <span class="piece-label">${p.name}</span>
+            </div>`,
+            )
+            .join("")}
+        </div>
+        <button id="rompe-check" class="game-btn" style="margin-top:14px;">Comprobar</button>
+        <p id="rompe-feedback" class="math-feedback"></p>
       </div>`;
 
-    area.querySelector(".multi-options").addEventListener("click", (e) => {
-      const btn = e.target.closest(".option-btn");
-      if (!btn) return;
-      const feedback = document.getElementById("fig-feedback");
-      if (btn.dataset.val === fig.name) {
-        score++;
-        btn.style.background = "#2ecc71";
-        feedback.textContent = "✅ ¡Correcto!";
-        feedback.style.color = "#2ecc71";
+    document.getElementById("rompe-pieces").addEventListener("click", (e) => {
+      const piece = e.target.closest(".rompe-piece");
+      if (!piece || piece.classList.contains("piece-correct") || piece.classList.contains("piece-wrong")) return;
+      const idx = piece.dataset.idx;
+      if (selectedPieces.has(idx)) {
+        selectedPieces.delete(idx);
+        piece.classList.remove("selected");
       } else {
-        btn.style.background = "#e74c3c";
-        feedback.textContent = `❌ Era: ${fig.name}`;
-        feedback.style.color = "#e74c3c";
+        selectedPieces.add(idx);
+        piece.classList.add("selected");
       }
-      area.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
+    });
+
+    document.getElementById("rompe-check").addEventListener("click", () => {
+      const selected = [...selectedPieces].map((i) => shuffledPieces[parseInt(i)]);
+      const correctSelected = selected.filter((p) => p.correct).length;
+      const wrongSelected = selected.filter((p) => !p.correct).length;
+      const totalCorrect = shuffledPieces.filter((p) => p.correct).length;
+      const fb = document.getElementById("rompe-feedback");
+
+      document.querySelectorAll(".rompe-piece").forEach((el) => {
+        const p = shuffledPieces[parseInt(el.dataset.idx)];
+        if (selectedPieces.has(el.dataset.idx)) {
+          el.classList.add(p.correct ? "piece-correct" : "piece-wrong");
+        }
+      });
+
+      if (correctSelected === totalCorrect && wrongSelected === 0) {
+        score++;
+        fb.textContent = `✅ ¡Perfecto! ${puz.name} = ${puz.correctPieces.join(" + ")}`;
+        fb.style.color = "#2ecc71";
+        narrateText(`¡Excelente! La figura ${puz.name} se forma con ${puz.correctPieces.join(" y ")}`);
+      } else {
+        fb.textContent = `❌ Las piezas correctas son: ${puz.correctPieces.join(" + ")}`;
+        fb.style.color = "#e74c3c";
+        narrateText(`Las piezas correctas son: ${puz.correctPieces.join(" y ")}`);
+      }
       current++;
-      setTimeout(render, 1000);
+      setTimeout(render, 2600);
     });
   }
   render();

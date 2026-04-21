@@ -657,3 +657,159 @@ button.fono-audio-btn {
   border: 2px solid #2ecc71 !important;
   background: #eafff2 !important;
 }
+
+/* ===== Matemáticas — Conteo Animado ===== */
+.conteo-container {
+  text-align: center;
+  width: 100%;
+}
+
+.conteo-objects {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px 0;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.conteo-obj {
+  font-size: 2rem;
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  display: inline-block;
+  cursor: default;
+  user-select: none;
+}
+.conteo-obj.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+.conteo-obj.counting {
+  transform: scale(1.35);
+  filter: drop-shadow(0 0 6px #6c5ce7);
+  animation: bounce 0.4s ease-in-out;
+}
+
+.conteo-hint {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #6c5ce7;
+  min-height: 2rem;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+/* ===== Matemáticas — Operaciones de Campo ===== */
+.campo-container {
+  text-align: center;
+  width: 100%;
+}
+
+.campo-problem {
+  background: #f8f7ff;
+  border: 2px solid #a29bfe;
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin: 10px 0 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.campo-tool {
+  font-size: 3rem;
+  animation: bounce 0.8s ease-in-out;
+}
+
+.campo-text {
+  font-size: 1.1rem;
+  color: #333;
+  line-height: 1.6;
+  font-weight: 500;
+  text-align: center;
+}
+
+.campo-op-badge {
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  color: #fff;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ===== Matemáticas — Rompecabezas Geométrico ===== */
+.rompe-container {
+  text-align: center;
+  width: 100%;
+}
+
+.rompe-target {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f0eeff;
+  border: 2px dashed #a29bfe;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 10px 0;
+  min-height: 120px;
+}
+
+.rompe-pieces {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.rompe-piece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #f8f7ff;
+  border: 2px solid #c8c3f7;
+  border-radius: 14px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    transform 0.15s,
+    background 0.2s;
+  user-select: none;
+}
+.rompe-piece:hover {
+  border-color: #6c5ce7;
+  transform: scale(1.05);
+}
+.rompe-piece.selected {
+  border-color: #6c5ce7;
+  background: #d5d0ff;
+  transform: scale(1.07);
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+}
+.rompe-piece.piece-correct {
+  border-color: #2ecc71 !important;
+  background: #eafff2 !important;
+  pointer-events: none;
+}
+.rompe-piece.piece-wrong {
+  border-color: #e74c3c !important;
+  background: #fff0f0 !important;
+  pointer-events: none;
+}
+
+.piece-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #555;
+}
