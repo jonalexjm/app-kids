@@ -1,56 +1,82 @@
-// Descripciones de los juegos
-const gameDescriptions = {
-  "sopa-letras": { title: "Sopa de Letras", desc: "Encuentra las palabras escondidas en la sopa de letras." },
-  "completa-palabra": { title: "Completa la Palabra", desc: "Completa las letras que faltan en cada palabra." },
-  "ordena-oraciones": {
-    title: "Ordena Oraciones",
-    desc: "Pon las palabras en el orden correcto para formar oraciones.",
-  },
-  "suma-resta": { title: "Suma y Resta", desc: "Resuelve operaciones de suma y resta lo más rápido que puedas." },
-  multiplicacion: { title: "Multiplicación", desc: "Practica las tablas de multiplicar con ejercicios divertidos." },
-  "figuras-geometricas": { title: "Figuras Geométricas", desc: "Identifica y aprende sobre las figuras geométricas." },
-  animales: { title: "Animales y Hábitats", desc: "Descubre dónde viven los animales y sus características." },
-  "cuerpo-humano": { title: "El Cuerpo Humano", desc: "Aprende las partes del cuerpo humano de forma interactiva." },
-  plantas: { title: "Las Plantas", desc: "Conoce las partes de las plantas y cómo crecen." },
-  paises: { title: "Países y Capitales", desc: "Relaciona cada país con su capital." },
-  banderas: { title: "Banderas del Mundo", desc: "¿Puedes reconocer las banderas de distintos países?" },
-  historia: { title: "Historia Divertida", desc: "Aprende datos históricos a través de preguntas y respuestas." },
-  colorear: { title: "Colorear", desc: "Elige colores y da vida a los dibujos." },
-  instrumentos: { title: "Instrumentos Musicales", desc: "Conoce los sonidos de distintos instrumentos." },
-  "dibujo-libre": { title: "Dibujo Libre", desc: "Dibuja lo que quieras en el lienzo en blanco." },
-};
+// ── Construir sidebar desde menuConfig (definido en menu-config.js) ──────────
+function buildSidebar() {
+  const menuEl = document.getElementById("menu");
+
+  menuConfig.forEach((materia) => {
+    const li = document.createElement("li");
+    li.className = "menu-item";
+
+    // Botón de la materia
+    const btn = document.createElement("button");
+    btn.className = "menu-btn";
+    btn.dataset.target = materia.id;
+    btn.innerHTML = `<span class="icon">${materia.icon}</span> ${materia.label} <span class="arrow">▸</span>`;
+    li.appendChild(btn);
+
+    // Submenú de juegos
+    const ul = document.createElement("ul");
+    ul.className = "submenu";
+    ul.id = materia.id;
+
+    materia.games.forEach((game) => {
+      const subLi = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = "#";
+      a.dataset.game = game.id;
+      a.textContent = game.label;
+      subLi.appendChild(a);
+      ul.appendChild(subLi);
+    });
+
+    li.appendChild(ul);
+    menuEl.appendChild(li);
+  });
+}
+
+// ── Índice de juegos construido desde menuConfig ──────────────────────────────
+function buildGameIndex() {
+  const index = {};
+  menuConfig.forEach((materia) => {
+    materia.games.forEach((game) => {
+      index[game.id] = { title: game.label, desc: game.desc };
+    });
+  });
+  return index;
+}
+
+// ── Inicializar ───────────────────────────────────────────────────────────────
+buildSidebar();
+const gameDescriptions = buildGameIndex();
 
 // Toggle submenús
-document.querySelectorAll(".menu-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const parent = btn.parentElement;
-    // Cerrar otros submenús abiertos
-    document.querySelectorAll(".menu-item.open").forEach((item) => {
-      if (item !== parent) item.classList.remove("open");
-    });
-    parent.classList.toggle("open");
+document.getElementById("menu").addEventListener("click", (e) => {
+  const btn = e.target.closest(".menu-btn");
+  if (!btn) return;
+  const parent = btn.parentElement;
+  document.querySelectorAll(".menu-item.open").forEach((item) => {
+    if (item !== parent) item.classList.remove("open");
   });
+  parent.classList.toggle("open");
 });
 
 // Click en juegos del submenú
-document.querySelectorAll(".submenu a").forEach((link) => {
-  link.addEventListener("click", (e) => {
-    e.preventDefault();
-    const gameId = link.getAttribute("data-game");
-    const info = gameDescriptions[gameId];
-    if (!info) return;
+document.getElementById("menu").addEventListener("click", (e) => {
+  const link = e.target.closest(".submenu a");
+  if (!link) return;
+  e.preventDefault();
 
-    // Marcar link activo
-    document.querySelectorAll(".submenu a.active").forEach((a) => a.classList.remove("active"));
-    link.classList.add("active");
+  const gameId = link.dataset.game;
+  const info = gameDescriptions[gameId];
+  if (!info) return;
 
-    // Mostrar vista de juego
-    document.getElementById("welcome").style.display = "none";
-    const gameView = document.getElementById("game-view");
-    gameView.style.display = "block";
-    document.getElementById("game-title").textContent = info.title;
-    document.getElementById("game-description").textContent = info.desc;
-    document.getElementById("game-area").textContent =
-      '🎮 ¡Próximamente! El juego "' + info.title + '" estará disponible pronto.';
-  });
+  document.querySelectorAll(".submenu a.active").forEach((a) => a.classList.remove("active"));
+  link.classList.add("active");
+
+  document.getElementById("welcome").style.display = "none";
+  const gameView = document.getElementById("game-view");
+  gameView.style.display = "block";
+  document.getElementById("game-title").textContent = info.title;
+  document.getElementById("game-description").textContent = info.desc;
+  document.getElementById("game-area").textContent =
+    `🎮 ¡Próximamente! El juego "${info.title}" estará disponible pronto.`;
 });
