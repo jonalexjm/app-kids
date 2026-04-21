@@ -48,10 +48,23 @@
 
       <!-- Contenido principal -->
       <main class="content">
+        <!-- Pantalla de bienvenida: mini-juego de explotar globos -->
         <div class="welcome" id="welcome">
-          <h1>¡Bienvenido!</h1>
-          <p>Selecciona una materia y un juego del menú para comenzar a aprender.</p>
-          <div class="welcome-icons"><span>📖</span><span>🔢</span><span>🌿</span><span>🌍</span><span>🎨</span></div>
+          <div class="welcome-header">
+            <h1 class="welcome-title">¡Bienvenido a <span>App Kids</span>!</h1>
+            <p class="welcome-sub">¡Explota los globos y luego elige tu materia favorita! 🎈</p>
+          </div>
+          <div class="welcome-game-wrap">
+            <canvas id="balloon-canvas" width="640" height="340"></canvas>
+            <div class="balloon-hud">
+              <span id="balloon-score-label">🎈 Globos: <strong id="balloon-score">0</strong></span>
+              <span id="balloon-combo-label"></span>
+            </div>
+          </div>
+          <div class="welcome-subjects">
+            <p class="welcome-subjects-hint">O elige una materia directamente:</p>
+            <div class="welcome-subject-chips" id="welcome-chips"></div>
+          </div>
         </div>
         <div class="game-view" id="game-view" style="display: none">
           <h1 id="game-title"></h1>
