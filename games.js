@@ -3,284 +3,442 @@
 const gameRenderers = {};
 
 // ╔══════════════════════════════════════════════════════════════════╗
-// ║  LENGUAJE                                                       ║
+// ║  LENGUAJE — Fauna y Flora del Cauca                             ║
 // ╚══════════════════════════════════════════════════════════════════╝
 
-// ── Sopa de Letras ───────────────────────────────────────────────────────────
-gameRenderers["sopa-letras"] = function (area) {
-  const words = ["GATO", "PERRO", "CASA", "SOL", "LUNA", "ARBOL", "FLOR", "RIO"];
-  const SIZE = 10;
-  const grid = Array.from({ length: SIZE }, () => Array(SIZE).fill(""));
-  const placed = [];
+// ── Datos compartidos: palabras de fauna y flora del Cauca ───────────────────
+const caucaWords = [
+  { word: "CÓNDOR", syllables: ["CÓN", "DOR"], type: "fauna", desc: "Ave majestuosa que vuela en los Andes del Cauca" },
+  {
+    word: "ORQUÍDEA",
+    syllables: ["OR", "QUÍ", "DE", "A"],
+    type: "flora",
+    desc: "Flor exótica que crece en los bosques del Cauca",
+  },
+  { word: "GUADUA", syllables: ["GUA", "DU", "A"], type: "flora", desc: "Bambú gigante típico del paisaje caucano" },
+  {
+    word: "COLIBRÍ",
+    syllables: ["CO", "LI", "BRÍ"],
+    type: "fauna",
+    desc: "Pequeña ave que se alimenta del néctar de las flores",
+  },
+  { word: "TUCÁN", syllables: ["TU", "CÁN"], type: "fauna", desc: "Ave de pico grande y colorido de la selva caucana" },
+  { word: "CEDRO", syllables: ["CE", "DRO"], type: "flora", desc: "Árbol noble de los bosques del Cauca" },
+  { word: "DANTA", syllables: ["DAN", "TA"], type: "fauna", desc: "Mamífero grande también llamado tapir" },
+  {
+    word: "CEIBA",
+    syllables: ["CEI", "BA"],
+    type: "flora",
+    desc: "Árbol gigante sagrado de las comunidades del Cauca",
+  },
+  {
+    word: "ARMADILLO",
+    syllables: ["AR", "MA", "DI", "LLO"],
+    type: "fauna",
+    desc: "Animal con caparazón que vive en el Cauca",
+  },
+  {
+    word: "HELECHO",
+    syllables: ["HE", "LE", "CHO"],
+    type: "flora",
+    desc: "Planta antigua de los bosques húmedos caucanos",
+  },
+  {
+    word: "GUACAMAYA",
+    syllables: ["GUA", "CA", "MA", "YA"],
+    type: "fauna",
+    desc: "Ave de plumaje rojo, azul y amarillo",
+  },
+  {
+    word: "BROMELIA",
+    syllables: ["BRO", "ME", "LI", "A"],
+    type: "flora",
+    desc: "Planta que crece sobre los árboles del Cauca",
+  },
+  { word: "ROBLE", syllables: ["RO", "BLE"], type: "flora", desc: "Árbol fuerte de las montañas caucanas" },
+  {
+    word: "ZARIGÜEYA",
+    syllables: ["ZA", "RI", "GÜE", "YA"],
+    type: "fauna",
+    desc: "Marsupial nocturno de los bosques del Cauca",
+  },
+  { word: "FRAILEJÓN", syllables: ["FRAI", "LE", "JÓN"], type: "flora", desc: "Planta del páramo que retiene agua" },
+];
 
-  function placeWord(word) {
-    const dirs = [
-      [0, 1],
-      [1, 0],
-      [1, 1],
-      [0, -1],
-      [-1, 0],
-    ];
-    for (let attempt = 0; attempt < 100; attempt++) {
-      const [dr, dc] = dirs[Math.floor(Math.random() * dirs.length)];
-      const r = Math.floor(Math.random() * SIZE);
-      const c = Math.floor(Math.random() * SIZE);
-      let fits = true;
-      for (let i = 0; i < word.length; i++) {
-        const nr = r + dr * i,
-          nc = c + dc * i;
-        if (nr < 0 || nr >= SIZE || nc < 0 || nc >= SIZE) {
-          fits = false;
-          break;
-        }
-        if (grid[nr][nc] !== "" && grid[nr][nc] !== word[i]) {
-          fits = false;
-          break;
-        }
-      }
-      if (fits) {
-        for (let i = 0; i < word.length; i++) grid[r + dr * i][c + dc * i] = word[i];
-        placed.push(word);
-        return true;
-      }
-    }
-    return false;
-  }
+// ── Utilidades compartidas ───────────────────────────────────────────────────
+function narrateText(text) {
+  if (!("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = "es-CO";
+  utt.rate = 0.85;
+  utt.pitch = 1.1;
+  window.speechSynthesis.speak(utt);
+}
 
-  words.forEach(placeWord);
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  for (let r = 0; r < SIZE; r++)
-    for (let c = 0; c < SIZE; c++) if (grid[r][c] === "") grid[r][c] = letters[Math.floor(Math.random() * 26)];
+function getMedal(pct) {
+  if (pct >= 90) return { icon: "🥇", label: "Maestro Lector", color: "#f1c40f" };
+  if (pct >= 70) return { icon: "🥈", label: "Gran Lector", color: "#bdc3c7" };
+  if (pct >= 50) return { icon: "🥉", label: "Lector Explorador", color: "#e67e22" };
+  return { icon: "📖", label: "Aprendiz", color: "#a29bfe" };
+}
 
-  let selecting = false,
-    selected = [],
-    foundCells = new Set();
-
+function renderMedal(score, total, area, gameId) {
+  const pct = Math.round((score / total) * 100);
+  const medal = getMedal(pct);
   area.innerHTML = `
-    <div class="sopa-container">
-      <div class="sopa-grid" id="sopa-grid"></div>
-      <div class="sopa-words" id="sopa-words">
-        <h3>Encuentra:</h3>
-        ${placed.map((w) => `<span class="sopa-word" id="sw-${w}">${w}</span>`).join("")}
+    <div class="game-result medal-result fadeIn">
+      <div class="medal-badge bounce" style="font-size:4rem;">${medal.icon}</div>
+      <h2 style="color:${medal.color};">Nivel: ${medal.label}</h2>
+      <p>Sílabas correctas: <strong>${score}</strong> de <strong>${total}</strong> (${pct}%)</p>
+      <div class="medal-stars">
+        ${"⭐".repeat(Math.ceil(pct / 25))}
       </div>
+      <button class="game-btn" onclick="gameRenderers['${gameId}'](this.closest('.game-area'))">Jugar de nuevo</button>
     </div>`;
+  narrateText(`¡Felicidades! Obtuviste nivel ${medal.label} con ${score} de ${total} sílabas correctas.`);
+}
 
-  const gridEl = document.getElementById("sopa-grid");
-  gridEl.style.cssText = `display:grid;grid-template-columns:repeat(${SIZE},36px);gap:2px;user-select:none;`;
-
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
-      const cell = document.createElement("div");
-      cell.textContent = grid[r][c];
-      cell.dataset.r = r;
-      cell.dataset.c = c;
-      cell.className = "sopa-cell";
-      cell.style.cssText =
-        "width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:#e8e5ff;border-radius:4px;font-weight:bold;cursor:pointer;font-size:0.95rem;";
-      gridEl.appendChild(cell);
-    }
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
+  return a;
+}
 
-  gridEl.addEventListener("mousedown", (e) => {
-    const cell = e.target.closest(".sopa-cell");
-    if (!cell) return;
-    selecting = true;
-    selected = [cell];
-    cell.style.background = "#b8b0ff";
-  });
-
-  gridEl.addEventListener("mouseover", (e) => {
-    if (!selecting) return;
-    const cell = e.target.closest(".sopa-cell");
-    if (!cell || selected.includes(cell)) return;
-    selected.push(cell);
-    cell.style.background = "#b8b0ff";
-  });
-
-  gridEl.addEventListener("mouseup", () => {
-    selecting = false;
-    const word = selected.map((c) => c.textContent).join("");
-    const wordRev = word.split("").reverse().join("");
-    const match = placed.find((w) => w === word || w === wordRev);
-    if (match) {
-      selected.forEach((c) => {
-        c.style.background = "#6c5ce7";
-        c.style.color = "#fff";
-        foundCells.add(c);
-      });
-      const tag = document.getElementById("sw-" + match);
-      if (tag) {
-        tag.style.textDecoration = "line-through";
-        tag.style.opacity = "0.5";
-      }
-    } else {
-      selected.forEach((c) => {
-        if (!foundCells.has(c)) c.style.background = "#e8e5ff";
-      });
-    }
-    selected = [];
-  });
-};
-
-// ── Completa la Palabra ──────────────────────────────────────────────────────
-gameRenderers["completa-palabra"] = function (area) {
-  const wordList = [
-    { word: "MARIPOSA", hint: "Insecto con alas coloridas" },
-    { word: "ELEFANTE", hint: "Animal grande con trompa" },
-    { word: "ESTRELLA", hint: "Brilla en el cielo de noche" },
-    { word: "CHOCOLATE", hint: "Dulce hecho de cacao" },
-    { word: "DINOSAURIO", hint: "Reptil gigante extinto" },
-    { word: "BICICLETA", hint: "Vehículo de dos ruedas" },
-  ];
-
+// ── 1. Conciencia Fonológica ─────────────────────────────────────────────────
+// El niño escucha la palabra y debe separar las sílabas correctamente
+gameRenderers["conciencia-fonologica"] = function (area) {
+  const pool = shuffle([...caucaWords]).slice(0, 8);
   let current = 0,
-    score = 0;
+    totalSyllables = 0,
+    correctSyllables = 0;
+  pool.forEach((w) => (totalSyllables += w.syllables.length));
 
   function render() {
-    const item = wordList[current];
-    const letters = item.word.split("");
-    const hideCount = Math.ceil(letters.length * 0.4);
-    const indices = [];
-    while (indices.length < hideCount) {
-      const i = Math.floor(Math.random() * letters.length);
-      if (!indices.includes(i)) indices.push(i);
+    if (current >= pool.length) {
+      renderMedal(correctSyllables, totalSyllables, area, "conciencia-fonologica");
+      return;
     }
+    const item = pool[current];
+    const typeLabel = item.type === "fauna" ? "🐾 Fauna" : "🌿 Flora";
+
+    // Generar opciones de sílabas: las correctas + distractores
+    const distractors = ["PA", "LO", "MI", "TRE", "SEN", "FU", "BI", "NOR", "PLA", "GRI"];
+    const allSyllables = shuffle([...item.syllables, ...shuffle(distractors).slice(0, 3)]);
+    let chosen = [];
 
     area.innerHTML = `
-      <div class="completa-container">
-        <p class="completa-score">Puntaje: ${score} / ${wordList.length}</p>
-        <p class="completa-hint">Pista: ${item.hint}</p>
-        <div class="completa-word" id="completa-word">
-          ${letters
-            .map((l, i) =>
-              indices.includes(i)
-                ? `<input type="text" maxlength="1" class="completa-input" data-idx="${i}" data-letter="${l}" style="width:36px;height:42px;text-align:center;font-size:1.2rem;border:2px solid #a29bfe;border-radius:8px;text-transform:uppercase;">`
-                : `<span style="display:inline-flex;width:36px;height:42px;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;">${l}</span>`,
-            )
-            .join("")}
+      <div class="fono-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">${typeLabel} del Cauca</span>
+          <span class="math-score">Sílabas: ${correctSyllables} | Palabra ${current + 1}/${pool.length}</span>
         </div>
-        <button id="completa-check" class="game-btn">Comprobar</button>
+        <div class="fono-word-display">
+          <span class="fono-word bounce">${item.word}</span>
+          <button class="fono-audio-btn" id="fono-listen" title="Escuchar">🔊</button>
+        </div>
+        <p class="fono-desc">${item.desc}</p>
+        <p class="fono-instruction">Selecciona las sílabas en orden correcto:</p>
+        <div class="fono-answer" id="fono-answer"></div>
+        <div class="fono-options" id="fono-options">
+          ${allSyllables.map((s, i) => `<button class="syllable-chip" data-syl="${s}" data-idx="${i}">${s}</button>`).join("")}
+        </div>
+        <div class="fono-actions">
+          <button id="fono-check" class="game-btn">Comprobar</button>
+          <button id="fono-clear" class="game-btn" style="background:#95a5a6;">Limpiar</button>
+        </div>
+        <p id="fono-feedback" class="math-feedback"></p>
       </div>`;
 
-    const inputs = area.querySelectorAll(".completa-input");
-    inputs[0]?.focus();
-    inputs.forEach((inp, i) => {
-      inp.addEventListener("input", () => {
-        if (inp.value && inputs[i + 1]) inputs[i + 1].focus();
+    // Narrar la palabra
+    setTimeout(() => narrateText(item.word), 300);
+
+    const answerEl = document.getElementById("fono-answer");
+    const optionsEl = document.getElementById("fono-options");
+
+    document.getElementById("fono-listen").addEventListener("click", () => narrateText(item.word));
+
+    optionsEl.addEventListener("click", (e) => {
+      const btn = e.target.closest(".syllable-chip");
+      if (!btn || btn.disabled) return;
+      chosen.push(btn.dataset.syl);
+      btn.disabled = true;
+      btn.classList.add("used");
+      const chip = document.createElement("span");
+      chip.className = "syllable-chip chosen popIn";
+      chip.textContent = btn.dataset.syl;
+      answerEl.appendChild(chip);
+    });
+
+    document.getElementById("fono-clear").addEventListener("click", () => {
+      chosen = [];
+      answerEl.innerHTML = "";
+      optionsEl.querySelectorAll(".syllable-chip").forEach((b) => {
+        b.disabled = false;
+        b.classList.remove("used");
       });
     });
 
-    document.getElementById("completa-check").addEventListener("click", () => {
-      let correct = true;
-      inputs.forEach((inp) => {
-        if (inp.value.toUpperCase() !== inp.dataset.letter) {
-          correct = false;
-          inp.style.borderColor = "#e74c3c";
-        } else {
-          inp.style.borderColor = "#2ecc71";
-        }
-      });
-      if (correct) {
-        score++;
-        current++;
-        if (current < wordList.length) setTimeout(render, 600);
-        else {
-          area.innerHTML = `<div class="game-result"><h2>🎉 ¡Completaste todas las palabras!</h2><p>Puntaje: ${score} / ${wordList.length}</p><button class="game-btn" onclick="gameRenderers['completa-palabra'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
-        }
+    document.getElementById("fono-check").addEventListener("click", () => {
+      const feedback = document.getElementById("fono-feedback");
+      const isCorrect = chosen.length === item.syllables.length && chosen.every((s, i) => s === item.syllables[i]);
+
+      if (isCorrect) {
+        correctSyllables += item.syllables.length;
+        feedback.textContent = `✅ ¡Correcto! ${item.word} = ${item.syllables.join(" - ")}`;
+        feedback.style.color = "#2ecc71";
+        narrateText(`¡Muy bien! ${item.syllables.join(", ")}`);
+        answerEl.querySelectorAll(".syllable-chip").forEach((c) => c.classList.add("correct"));
+      } else {
+        // Dar puntos parciales por sílabas en posición correcta
+        let partial = 0;
+        chosen.forEach((s, i) => {
+          if (item.syllables[i] === s) partial++;
+        });
+        correctSyllables += partial;
+        feedback.textContent = `❌ La respuesta era: ${item.syllables.join(" - ")} (${partial} sílaba${partial !== 1 ? "s" : ""} correcta${partial !== 1 ? "s" : ""})`;
+        feedback.style.color = "#e74c3c";
+        narrateText(`La separación correcta es: ${item.syllables.join(", ")}`);
       }
+      current++;
+      setTimeout(render, 2000);
     });
   }
   render();
 };
 
-// ── Ordena Oraciones ─────────────────────────────────────────────────────────
-gameRenderers["ordena-oraciones"] = function (area) {
-  const sentences = [
-    "El gato duerme en la cama",
-    "Los niños juegan en el parque",
-    "Mi mamá cocina una torta deliciosa",
-    "El sol sale por la mañana",
-    "Las flores crecen en el jardín",
-  ];
-
+// ── 2. Lectura Silábica ──────────────────────────────────────────────────────
+// Se muestra la palabra con sílabas faltantes que el niño debe completar
+gameRenderers["lectura-silabica"] = function (area) {
+  const pool = shuffle([...caucaWords]).slice(0, 8);
   let current = 0,
-    score = 0;
-
-  function shuffle(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
+    totalSyllables = 0,
+    correctSyllables = 0;
 
   function render() {
-    const words = sentences[current].split(" ");
-    const shuffled = shuffle(words);
-    let chosen = [];
+    if (current >= pool.length) {
+      renderMedal(correctSyllables, totalSyllables, area, "lectura-silabica");
+      return;
+    }
+    const item = pool[current];
+    const syls = item.syllables;
+    const typeLabel = item.type === "fauna" ? "🐾 Fauna" : "🌿 Flora";
+
+    // Decidir qué sílabas ocultar (al menos 1, máximo la mitad+1)
+    const hideCount = Math.max(1, Math.ceil(syls.length / 2));
+    const hideIndices = [];
+    const candidates = syls.map((_, i) => i);
+    while (hideIndices.length < hideCount && candidates.length) {
+      const pick = Math.floor(Math.random() * candidates.length);
+      hideIndices.push(candidates.splice(pick, 1)[0]);
+    }
+    totalSyllables += hideCount;
+
+    // Distractores
+    const distractors = shuffle(caucaWords.filter((w) => w.word !== item.word).flatMap((w) => w.syllables)).slice(0, 4);
+    const hiddenSyls = hideIndices.map((i) => syls[i]);
+    const options = shuffle([...new Set([...hiddenSyls, ...distractors])]);
 
     area.innerHTML = `
-      <div class="ordena-container">
-        <p class="ordena-score">Puntaje: ${score} / ${sentences.length}</p>
-        <div class="ordena-answer" id="ordena-answer" style="min-height:48px;padding:10px;background:#e8e5ff;border-radius:12px;margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;"></div>
-        <div class="ordena-options" id="ordena-options" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
-        <button id="ordena-check" class="game-btn" style="margin-top:16px;">Comprobar</button>
+      <div class="silabica-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">${typeLabel} del Cauca</span>
+          <span class="math-score">Sílabas: ${correctSyllables} | Palabra ${current + 1}/${pool.length}</span>
+        </div>
+        <button class="fono-audio-btn" id="sil-listen" title="Escuchar la palabra" style="font-size:2rem;margin-bottom:8px;">🔊 Escuchar</button>
+        <p class="fono-desc">${item.desc}</p>
+        <div class="silabica-word" id="sil-word">
+          ${syls
+            .map((s, i) =>
+              hideIndices.includes(i)
+                ? `<span class="syl-slot empty" data-idx="${i}" data-answer="${s}">___</span>`
+                : `<span class="syl-slot filled popIn">${s}</span>`,
+            )
+            .join(`<span class="syl-dash">-</span>`)}
+        </div>
+        <p class="fono-instruction">Arrastra o haz clic en las sílabas correctas:</p>
+        <div class="sil-options" id="sil-options">
+          ${options.map((o) => `<button class="syllable-chip" data-syl="${o}">${o}</button>`).join("")}
+        </div>
+        <div class="fono-actions">
+          <button id="sil-check" class="game-btn">Comprobar</button>
+        </div>
+        <p id="sil-feedback" class="math-feedback"></p>
       </div>`;
 
-    const optionsEl = document.getElementById("ordena-options");
-    const answerEl = document.getElementById("ordena-answer");
+    setTimeout(() => narrateText(item.word), 400);
 
-    shuffled.forEach((w, i) => {
+    document.getElementById("sil-listen").addEventListener("click", () => narrateText(item.word));
+
+    const emptySlots = area.querySelectorAll(".syl-slot.empty");
+    let currentSlot = 0;
+
+    document.getElementById("sil-options").addEventListener("click", (e) => {
+      const btn = e.target.closest(".syllable-chip");
+      if (!btn || btn.disabled || currentSlot >= emptySlots.length) return;
+      const slot = emptySlots[currentSlot];
+      slot.textContent = btn.dataset.syl;
+      slot.dataset.chosen = btn.dataset.syl;
+      slot.classList.add("popIn");
+      slot.classList.remove("empty");
+      slot.classList.add("filled-by-user");
+      btn.disabled = true;
+      btn.classList.add("used");
+      currentSlot++;
+    });
+
+    document.getElementById("sil-check").addEventListener("click", () => {
+      const feedback = document.getElementById("sil-feedback");
+      let correct = 0;
+
+      emptySlots.forEach((slot) => {
+        if (slot.dataset.chosen === slot.dataset.answer) {
+          correct++;
+          slot.classList.add("correct");
+        } else {
+          slot.classList.add("incorrect");
+          slot.textContent = slot.dataset.answer;
+        }
+      });
+
+      correctSyllables += correct;
+      const allRight = correct === hideCount;
+
+      if (allRight) {
+        feedback.textContent = `✅ ¡Perfecto! ${syls.join(" - ")}`;
+        feedback.style.color = "#2ecc71";
+        narrateText(`¡Excelente! ${item.word}. ${syls.join(", ")}`);
+      } else {
+        feedback.textContent = `${correct > 0 ? "🟡" : "❌"} ${correct} de ${hideCount} sílabas correctas → ${syls.join(" - ")}`;
+        feedback.style.color = correct > 0 ? "#e67e22" : "#e74c3c";
+        narrateText(`La palabra es ${item.word}. ${syls.join(", ")}`);
+      }
+      current++;
+      setTimeout(render, 2200);
+    });
+  }
+  render();
+};
+
+// ── 3. Vocabulario Contextualizado ───────────────────────────────────────────
+// Oraciones sobre fauna y flora del Cauca, el niño ordena las palabras
+gameRenderers["vocabulario-contextualizado"] = function (area) {
+  const sentences = [
+    { text: "El cóndor vuela sobre las montañas del Cauca", keyword: "cóndor", type: "fauna" },
+    { text: "La orquídea florece en los bosques húmedos", keyword: "orquídea", type: "flora" },
+    { text: "El colibrí bebe néctar de las flores silvestres", keyword: "colibrí", type: "fauna" },
+    { text: "La guadua crece junto a los ríos del Cauca", keyword: "guadua", type: "flora" },
+    { text: "El tucán tiene un pico grande y colorido", keyword: "tucán", type: "fauna" },
+    { text: "La ceiba es el árbol más grande del bosque", keyword: "ceiba", type: "flora" },
+    { text: "El armadillo se protege con su caparazón", keyword: "armadillo", type: "fauna" },
+    { text: "El frailejón retiene agua en el páramo andino", keyword: "frailejón", type: "flora" },
+    { text: "La guacamaya vive en la selva tropical caucana", keyword: "guacamaya", type: "fauna" },
+    { text: "Los helechos crecen bajo la sombra de los árboles", keyword: "helechos", type: "flora" },
+  ];
+
+  const pool = shuffle(sentences).slice(0, 6);
+  let current = 0,
+    totalSyllables = 0,
+    correctSyllables = 0;
+
+  // Contar sílabas totales de las keywords
+  pool.forEach((s) => {
+    const found = caucaWords.find((w) => w.word.toLowerCase() === s.keyword.toLowerCase());
+    if (found) totalSyllables += found.syllables.length;
+    else totalSyllables += 2;
+  });
+
+  function render() {
+    if (current >= pool.length) {
+      renderMedal(correctSyllables, totalSyllables, area, "vocabulario-contextualizado");
+      return;
+    }
+    const item = pool[current];
+    const words = item.text.split(" ");
+    const shuffled = shuffle(words);
+    let chosen = [];
+    const typeLabel = item.type === "fauna" ? "🐾 Fauna" : "🌿 Flora";
+    const wordData = caucaWords.find((w) => w.word.toLowerCase() === item.keyword.toLowerCase());
+
+    area.innerHTML = `
+      <div class="vocab-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">${typeLabel} del Cauca</span>
+          <span class="math-score">Sílabas: ${correctSyllables} | Oración ${current + 1}/${pool.length}</span>
+        </div>
+        <button class="fono-audio-btn" id="vocab-listen" title="Escuchar">🔊 Escuchar oración</button>
+        ${wordData ? `<p class="fono-desc">Palabra clave: <strong>${wordData.word}</strong> (${wordData.syllables.join(" - ")})</p>` : ""}
+        <p class="fono-instruction">Ordena las palabras para formar la oración:</p>
+        <div class="ordena-answer" id="vocab-answer" style="min-height:48px;padding:10px;background:#e8e5ff;border-radius:12px;margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+        <div class="ordena-options" id="vocab-options" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;"></div>
+        <div class="fono-actions">
+          <button id="vocab-check" class="game-btn">Comprobar</button>
+          <button id="vocab-clear" class="game-btn" style="background:#95a5a6;">Limpiar</button>
+        </div>
+        <p id="vocab-feedback" class="math-feedback"></p>
+      </div>`;
+
+    setTimeout(() => narrateText(item.text), 500);
+
+    const answerEl = document.getElementById("vocab-answer");
+    const optionsEl = document.getElementById("vocab-options");
+
+    document.getElementById("vocab-listen").addEventListener("click", () => narrateText(item.text));
+
+    shuffled.forEach((w) => {
       const btn = document.createElement("button");
       btn.textContent = w;
       btn.className = "word-chip";
-      btn.dataset.index = i;
       btn.addEventListener("click", () => {
+        if (btn.disabled) return;
         chosen.push(w);
         btn.disabled = true;
-        btn.style.opacity = "0.4";
+        btn.classList.add("used");
         const chip = document.createElement("span");
         chip.textContent = w;
-        chip.className = "word-chip chosen";
+        chip.className = "word-chip chosen popIn";
         chip.addEventListener("click", () => {
-          chosen = chosen.filter((x) =>
-            x !== w || chosen.indexOf(x) !== chosen.lastIndexOf(x)
-              ? true
-              : (chosen.splice(chosen.indexOf(x), 1), false),
-          );
-          chosen = chosen.filter(() => true); // recompact
+          chosen.splice(chosen.indexOf(w), 1);
           chip.remove();
           btn.disabled = false;
-          btn.style.opacity = "1";
-          rebuildAnswer();
+          btn.classList.remove("used");
         });
         answerEl.appendChild(chip);
       });
       optionsEl.appendChild(btn);
     });
 
-    function rebuildAnswer() {
+    document.getElementById("vocab-clear").addEventListener("click", () => {
+      chosen = [];
       answerEl.innerHTML = "";
-      chosen.forEach((w) => {
-        const chip = document.createElement("span");
-        chip.textContent = w;
-        chip.className = "word-chip chosen";
-        answerEl.appendChild(chip);
+      optionsEl.querySelectorAll(".word-chip").forEach((b) => {
+        b.disabled = false;
+        b.classList.remove("used");
       });
-    }
+    });
 
-    document.getElementById("ordena-check").addEventListener("click", () => {
-      if (chosen.join(" ") === sentences[current]) {
-        score++;
-        current++;
-        if (current < sentences.length) setTimeout(render, 600);
-        else
-          area.innerHTML = `<div class="game-result"><h2>🎉 ¡Excelente!</h2><p>Puntaje: ${score} / ${sentences.length}</p><button class="game-btn" onclick="gameRenderers['ordena-oraciones'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
+    document.getElementById("vocab-check").addEventListener("click", () => {
+      const feedback = document.getElementById("vocab-feedback");
+      const isCorrect = chosen.join(" ") === item.text;
+
+      if (isCorrect) {
+        if (wordData) correctSyllables += wordData.syllables.length;
+        else correctSyllables += 2;
+        feedback.textContent = `✅ ¡Excelente! Oración correcta.`;
+        feedback.style.color = "#2ecc71";
+        answerEl.classList.add("correct-answer");
+        narrateText(`¡Muy bien! ${item.text}`);
       } else {
+        feedback.textContent = `❌ La oración correcta es: "${item.text}"`;
+        feedback.style.color = "#e74c3c";
         answerEl.style.border = "2px solid #e74c3c";
-        setTimeout(() => (answerEl.style.border = "none"), 800);
+        narrateText(`La oración correcta es: ${item.text}`);
       }
+      current++;
+      setTimeout(render, 2500);
     });
   }
   render();

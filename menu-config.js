@@ -7,19 +7,19 @@ const menuConfig = [
     icon: "📖",
     games: [
       {
-        id: "sopa-letras",
-        label: "Sopa de Letras",
-        desc: "Encuentra las palabras escondidas en la sopa de letras.",
+        id: "conciencia-fonologica",
+        label: "Conciencia Fonológica",
+        desc: "Escucha, identifica y separa las sílabas de palabras de fauna y flora del Cauca.",
       },
       {
-        id: "completa-palabra",
-        label: "Completa la Palabra",
-        desc: "Completa las letras que faltan en cada palabra.",
+        id: "lectura-silabica",
+        label: "Lectura Silábica",
+        desc: "Completa las sílabas faltantes en palabras de la naturaleza caucana.",
       },
       {
-        id: "ordena-oraciones",
-        label: "Ordena Oraciones",
-        desc: "Pon las palabras en el orden correcto para formar oraciones.",
+        id: "vocabulario-contextualizado",
+        label: "Vocabulario Contextualizado",
+        desc: "Lee oraciones sobre la fauna y flora del Cauca y ordena las palabras.",
       },
     ],
   },
