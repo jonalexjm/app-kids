@@ -1,0 +1,180 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: linear-gradient(180deg, #6c5ce7, #a29bfe);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 24px 20px 16px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-header h2 {
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+/* Menu */
+.menu {
+  list-style: none;
+  padding: 10px 0;
+}
+
+.menu-item {
+  margin-bottom: 2px;
+}
+
+.menu-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 0.95rem;
+  padding: 12px 20px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.menu-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.menu-btn .arrow {
+  margin-left: auto;
+  font-size: 0.8rem;
+  transition: transform 0.25s;
+}
+
+.menu-item.open .menu-btn {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.menu-item.open .menu-btn .arrow {
+  transform: rotate(90deg);
+}
+
+.icon {
+  font-size: 1.2rem;
+}
+
+/* Submenu */
+.submenu {
+  list-style: none;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.menu-item.open .submenu {
+  max-height: 200px;
+}
+
+.submenu li a {
+  display: block;
+  padding: 10px 20px 10px 52px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 0.88rem;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.submenu li a:hover,
+.submenu li a.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* ===== Main content ===== */
+.content {
+  flex: 1;
+  background: #f0f0f3;
+  padding: 40px;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Welcome */
+.welcome {
+  text-align: center;
+}
+
+.welcome h1 {
+  font-size: 2.4rem;
+  color: #6c5ce7;
+  margin-bottom: 12px;
+}
+
+.welcome p {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.welcome-icons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 2.5rem;
+}
+
+/* Game view */
+.game-view {
+  width: 100%;
+  max-width: 700px;
+}
+
+.game-view h1 {
+  font-size: 1.8rem;
+  color: #6c5ce7;
+  margin-bottom: 8px;
+}
+
+.game-view p {
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.game-area {
+  background: #fff;
+  border-radius: 16px;
+  padding: 30px;
+  min-height: 300px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: #444;
+}

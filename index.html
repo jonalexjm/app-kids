@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self';" />
+    <title>App Kids - Aprende Jugando</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <nav class="sidebar">
+        <div class="sidebar-header">
+          <h2>App Kids</h2>
+        </div>
+        <ul class="menu">
+          <!-- Lenguaje -->
+          <li class="menu-item">
+            <button class="menu-btn" data-target="lenguaje">
+              <span class="icon">📖</span> Lenguaje
+              <span class="arrow">▸</span>
+            </button>
+            <ul class="submenu" id="lenguaje">
+              <li><a href="#" data-game="sopa-letras">Sopa de Letras</a></li>
+              <li><a href="#" data-game="completa-palabra">Completa la Palabra</a></li>
+              <li><a href="#" data-game="ordena-oraciones">Ordena Oraciones</a></li>
+            </ul>
+          </li>
+
+          <!-- Matemáticas -->
+          <li class="menu-item">
+            <button class="menu-btn" data-target="matematicas">
+              <span class="icon">🔢</span> Matemáticas
+              <span class="arrow">▸</span>
+            </button>
+            <ul class="submenu" id="matematicas">
+              <li><a href="#" data-game="suma-resta">Suma y Resta</a></li>
+              <li><a href="#" data-game="multiplicacion">Multiplicación</a></li>
+              <li><a href="#" data-game="figuras-geometricas">Figuras Geométricas</a></li>
+            </ul>
+          </li>
+
+          <!-- Ciencias Naturales -->
+          <li class="menu-item">
+            <button class="menu-btn" data-target="ciencias-naturales">
+              <span class="icon">🌿</span> Ciencias Naturales
+              <span class="arrow">▸</span>
+            </button>
+            <ul class="submenu" id="ciencias-naturales">
+              <li><a href="#" data-game="animales">Animales y Hábitats</a></li>
+              <li><a href="#" data-game="cuerpo-humano">El Cuerpo Humano</a></li>
+              <li><a href="#" data-game="plantas">Las Plantas</a></li>
+            </ul>
+          </li>
+
+          <!-- Ciencias Sociales -->
+          <li class="menu-item">
+            <button class="menu-btn" data-target="ciencias-sociales">
+              <span class="icon">🌍</span> Ciencias Sociales
+              <span class="arrow">▸</span>
+            </button>
+            <ul class="submenu" id="ciencias-sociales">
+              <li><a href="#" data-game="paises">Países y Capitales</a></li>
+              <li><a href="#" data-game="banderas">Banderas del Mundo</a></li>
+              <li><a href="#" data-game="historia">Historia Divertida</a></li>
+            </ul>
+          </li>
+
+          <!-- Educación Artística -->
+          <li class="menu-item">
+            <button class="menu-btn" data-target="educacion-artistica">
+              <span class="icon">🎨</span> Educación Artística
+              <span class="arrow">▸</span>
+            </button>
+            <ul class="submenu" id="educacion-artistica">
+              <li><a href="#" data-game="colorear">Colorear</a></li>
+              <li><a href="#" data-game="instrumentos">Instrumentos Musicales</a></li>
+              <li><a href="#" data-game="dibujo-libre">Dibujo Libre</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Contenido principal -->
+      <main class="content">
+        <div class="welcome" id="welcome">
+          <h1>¡Bienvenido!</h1>
+          <p>Selecciona una materia y un juego del menú para comenzar a aprender.</p>
+          <div class="welcome-icons"><span>📖</span><span>🔢</span><span>🌿</span><span>🌍</span><span>🎨</span></div>
+        </div>
+        <div class="game-view" id="game-view" style="display: none">
+          <h1 id="game-title"></h1>
+          <p id="game-description"></p>
+          <div id="game-area" class="game-area"></div>
+        </div>
+      </main>
+    </div>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>
