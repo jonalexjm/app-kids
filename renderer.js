@@ -77,6 +77,12 @@ document.getElementById("menu").addEventListener("click", (e) => {
   gameView.style.display = "block";
   document.getElementById("game-title").textContent = info.title;
   document.getElementById("game-description").textContent = info.desc;
-  document.getElementById("game-area").textContent =
-    `🎮 ¡Próximamente! El juego "${info.title}" estará disponible pronto.`;
+
+  const gameArea = document.getElementById("game-area");
+  gameArea.innerHTML = "";
+  if (gameRenderers[gameId]) {
+    gameRenderers[gameId](gameArea);
+  } else {
+    gameArea.textContent = `🎮 ¡Próximamente! El juego "${info.title}" estará disponible pronto.`;
+  }
 });

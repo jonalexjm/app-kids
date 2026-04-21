@@ -173,8 +173,226 @@ body {
   min-height: 300px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
   color: #444;
+}
+
+/* ===== Juegos: componentes compartidos ===== */
+.game-btn {
+  background: #6c5ce7;
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background 0.2s;
+}
+.game-btn:hover {
+  background: #5a4bd1;
+}
+
+.game-result {
+  text-align: center;
+}
+.game-result h2 {
+  color: #6c5ce7;
+  margin-bottom: 10px;
+}
+.game-result p {
+  margin-bottom: 14px;
+  color: #555;
+}
+
+/* Quiz / opciones */
+.quiz-container,
+.math-container,
+.figuras-container,
+.completa-container,
+.ordena-container {
+  text-align: center;
+  width: 100%;
+}
+
+.quiz-question {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.math-problem {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #6c5ce7;
+  margin-bottom: 18px;
+}
+.math-input {
+  font-size: 1.4rem;
+  padding: 8px 16px;
+  border: 2px solid #a29bfe;
+  border-radius: 10px;
+  width: 120px;
+  text-align: center;
+  outline: none;
+}
+.math-input:focus {
+  border-color: #6c5ce7;
+}
+.math-score {
+  color: #888;
+  margin-bottom: 14px;
+  font-size: 0.9rem;
+}
+.math-feedback {
+  margin-top: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-height: 1.4em;
+}
+
+.multi-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.option-btn {
+  padding: 10px 20px;
+  border: 2px solid #a29bfe;
+  background: #f8f7ff;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+  color: #333;
+}
+.option-btn:hover:not(:disabled) {
+  background: #e8e5ff;
+  border-color: #6c5ce7;
+}
+.option-btn:disabled {
+  cursor: default;
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Sopa de letras */
+.sopa-container {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.sopa-words {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sopa-words h3 {
+  color: #6c5ce7;
+  margin-bottom: 6px;
+}
+.sopa-word {
+  font-size: 0.95rem;
+  padding: 4px 10px;
+  background: #e8e5ff;
+  border-radius: 6px;
+}
+
+/* Completa la palabra */
+.completa-hint {
+  color: #888;
+  margin-bottom: 16px;
+  font-style: italic;
+}
+.completa-score {
+  color: #888;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+.completa-word {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+/* Ordena oraciones */
+.word-chip {
+  padding: 8px 16px;
+  background: #e8e5ff;
+  border: 2px solid #a29bfe;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.word-chip:hover {
+  background: #d5d0ff;
+}
+.word-chip.chosen {
+  background: #6c5ce7;
+  color: #fff;
+  border-color: #6c5ce7;
+}
+
+/* Match (animales) */
+.match-container {
+  width: 100%;
+}
+.match-columns {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+}
+.match-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.match-card {
+  padding: 10px 18px;
+  border: 2px solid #a29bfe;
+  background: #f8f7ff;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+}
+.match-card:hover:not(:disabled) {
+  background: #e8e5ff;
+  transform: scale(1.03);
+}
+.match-card.selected {
+  border-color: #6c5ce7;
+  background: #d5d0ff;
+}
+.match-card:disabled {
+  cursor: default;
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Colorear / Dibujo */
+.colorear-container,
+.dibujo-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.color-palette {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
