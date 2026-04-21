@@ -1043,181 +1043,392 @@ gameRenderers["rompecabezas-geometrico"] = function (area) {
 // ║  CIENCIAS NATURALES                                             ║
 // ╚══════════════════════════════════════════════════════════════════╝
 
-// ── Animales y Hábitats ──────────────────────────────────────────────────────
-gameRenderers["animales"] = function (area) {
-  const pairs = [
-    { animal: "🐪 Camello", habitat: "Desierto" },
-    { animal: "🐧 Pingüino", habitat: "Antártida" },
-    { animal: "🐒 Mono", habitat: "Selva" },
-    { animal: "🐻‍❄️ Oso Polar", habitat: "Ártico" },
-    { animal: "🐠 Pez Payaso", habitat: "Océano" },
-    { animal: "🦁 León", habitat: "Sabana" },
+// ── 1. Seres Vivos y Medio Ambiente ──────────────────────────────────────────
+gameRenderers["seres-vivos"] = function (area) {
+  const rounds = [
+    // Ronda A: ¿Es ser vivo o no?
+    {
+      type: "vivo-novivo",
+      items: [
+        { label: "🐝 Abeja", alive: true, reason: "Nace, crece, se reproduce y muere." },
+        { label: "🪨 Piedra", alive: false, reason: "No nace ni crece ni respira." },
+        { label: "🌻 Girasol", alive: true, reason: "Es una planta: nace, crece y se reproduce." },
+        { label: "💧 Agua", alive: false, reason: "No tiene vida propia." },
+        { label: "🐸 Rana", alive: true, reason: "Respira, come y se reproduce." },
+        { label: "🪵 Madera", alive: false, reason: "Es materia inerte." },
+        { label: "🌵 Cactus", alive: true, reason: "Planta que vive en el desierto." },
+        { label: "🔦 Linterna", alive: false, reason: "Es un objeto fabricado." },
+      ],
+    },
+    // Ronda B: Cuidado del medio ambiente — ¿Buena o mala acción?
+    {
+      type: "medio-ambiente",
+      items: [
+        { label: "🗑️ Tirar basura al río", good: false, reason: "Contamina el agua y daña a los animales." },
+        { label: "🌱 Plantar un árbol", good: true, reason: "¡Excelente! Los árboles limpian el aire." },
+        { label: "🚰 Cerrar el grifo al cepillarse", good: true, reason: "Ahorras agua, un recurso valioso." },
+        { label: "🔥 Quemar la basura", good: false, reason: "Contamina el aire con humo." },
+        { label: "♻️ Reciclar papel y plástico", good: true, reason: "Reduces los residuos y cuidas la Tierra." },
+        { label: "🚗 Dejar el carro prendido", good: false, reason: "Emite gases que contaminan el aire." },
+        { label: "💡 Apagar la luz al salir", good: true, reason: "Ahorras energía eléctrica." },
+        { label: "🏭 Arrojar químicos al suelo", good: false, reason: "Envenena el suelo y los seres vivos." },
+      ],
+    },
   ];
 
-  let score = 0,
-    answered = 0;
-  const shuffledHabitats = [...pairs].sort(() => Math.random() - 0.5);
-  let selectedAnimal = null;
+  let roundIdx = 0,
+    itemIdx = 0,
+    score = 0,
+    total = 0;
 
-  area.innerHTML = `
-    <div class="match-container">
-      <p class="math-score" id="match-score">Puntaje: 0 / ${pairs.length}</p>
-      <div class="match-columns">
-        <div class="match-col" id="animals-col">
-          ${pairs.map((p, i) => `<button class="match-card animal-card" data-habitat="${p.habitat}" data-idx="${i}">${p.animal}</button>`).join("")}
-        </div>
-        <div class="match-col" id="habitats-col">
-          ${shuffledHabitats.map((p, i) => `<button class="match-card habitat-card" data-habitat="${p.habitat}" data-idx="${i}">${p.habitat}</button>`).join("")}
-        </div>
-      </div>
-    </div>`;
+  function getItems() {
+    return rounds[roundIdx].items;
+  }
+  function getType() {
+    return rounds[roundIdx].type;
+  }
 
-  area.addEventListener("click", (e) => {
-    const animalBtn = e.target.closest(".animal-card");
-    const habitatBtn = e.target.closest(".habitat-card");
-
-    if (animalBtn && !animalBtn.disabled) {
-      area.querySelectorAll(".animal-card").forEach((b) => b.classList.remove("selected"));
-      animalBtn.classList.add("selected");
-      selectedAnimal = animalBtn;
+  function renderItem() {
+    if (roundIdx >= rounds.length) {
+      renderMathMedal(score, total, area, "seres-vivos");
+      return;
+    }
+    const items = getItems();
+    if (itemIdx >= items.length) {
+      roundIdx++;
+      itemIdx = 0;
+      renderItem();
+      return;
     }
 
-    if (habitatBtn && selectedAnimal && !habitatBtn.disabled) {
-      answered++;
-      if (selectedAnimal.dataset.habitat === habitatBtn.dataset.habitat) {
+    const item = items[itemIdx];
+    const isVivo = getType() === "vivo-novivo";
+    total++;
+
+    area.innerHTML = `
+      <div class="seres-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">${isVivo ? "🌿 Seres Vivos" : "🌍 Medio Ambiente"}</span>
+          <span class="math-score">Puntaje: ${score} | ${roundIdx + 1}/2 · Ítem ${itemIdx + 1}/${items.length}</span>
+        </div>
+        <button class="fono-audio-btn" id="sv-listen" style="margin-bottom:10px;">🔊 Escuchar</button>
+        <div class="seres-item bounce">${item.label}</div>
+        <p class="fono-instruction">${isVivo ? "¿Es un ser vivo?" : "¿Es una buena acción para el medio ambiente?"}</p>
+        <div class="seres-btns">
+          <button class="seres-yes game-btn" id="sv-yes">✅ ${isVivo ? "Sí, es vivo" : "Sí, es buena"}</button>
+          <button class="seres-no game-btn"  id="sv-no" style="background:#e74c3c;">❌ ${isVivo ? "No es vivo" : "No, es mala"}</button>
+        </div>
+        <p id="sv-feedback" class="math-feedback"></p>
+      </div>`;
+
+    const correct = isVivo ? item.alive : item.good;
+    narrateText(item.label.replace(/[^\w\s]/gi, ""));
+
+    document
+      .getElementById("sv-listen")
+      .addEventListener("click", () => narrateText(item.label.replace(/[^\w\s]/gi, "") + ". " + item.reason));
+
+    function answer(chose) {
+      const fb = document.getElementById("sv-feedback");
+      document.getElementById("sv-yes").disabled = true;
+      document.getElementById("sv-no").disabled = true;
+      if (chose === correct) {
         score++;
-        selectedAnimal.style.background = "#2ecc71";
-        habitatBtn.style.background = "#2ecc71";
-        selectedAnimal.disabled = true;
-        habitatBtn.disabled = true;
+        fb.textContent = `✅ ¡Correcto! ${item.reason}`;
+        fb.style.color = "#2ecc71";
       } else {
-        selectedAnimal.style.background = "#e74c3c";
-        habitatBtn.style.background = "#e74c3c";
-        setTimeout(() => {
-          selectedAnimal.style.background = "";
-          habitatBtn.style.background = "";
-        }, 600);
+        fb.textContent = `❌ ${item.reason}`;
+        fb.style.color = "#e74c3c";
       }
-      selectedAnimal.classList.remove("selected");
-      selectedAnimal = null;
-      document.getElementById("match-score").textContent = `Puntaje: ${score} / ${pairs.length}`;
-      if (score === pairs.length) {
-        setTimeout(() => {
-          area.innerHTML = `<div class="game-result"><h2>🎉 ¡Todos los animales en su hábitat!</h2><button class="game-btn" onclick="gameRenderers['animales'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
-        }, 500);
-      }
+      narrateText(item.reason);
+      itemIdx++;
+      setTimeout(renderItem, 2200);
     }
-  });
+    document.getElementById("sv-yes").addEventListener("click", () => answer(true));
+    document.getElementById("sv-no").addEventListener("click", () => answer(false));
+  }
+  renderItem();
 };
 
-// ── El Cuerpo Humano ─────────────────────────────────────────────────────────
-gameRenderers["cuerpo-humano"] = function (area) {
-  const questions = [
-    { q: "¿Qué órgano bombea la sangre?", options: ["Corazón", "Pulmón", "Hígado", "Riñón"], answer: "Corazón" },
-    {
-      q: "¿Con qué parte del cuerpo respiramos?",
-      options: ["Pulmones", "Estómago", "Cerebro", "Huesos"],
-      answer: "Pulmones",
-    },
-    { q: "¿Cuántos huesos tiene un adulto (aprox.)?", options: ["206", "100", "350", "50"], answer: "206" },
-    { q: "¿Qué órgano controla todo el cuerpo?", options: ["Cerebro", "Corazón", "Hígado", "Piel"], answer: "Cerebro" },
-    {
-      q: "¿Dónde se digieren los alimentos?",
-      options: ["Estómago", "Pulmones", "Riñones", "Corazón"],
-      answer: "Estómago",
-    },
-    { q: "¿Qué protege nuestros órganos internos?", options: ["Huesos", "Pelo", "Uñas", "Dientes"], answer: "Huesos" },
+// ── 2. Clasifica los Animales ────────────────────────────────────────────────
+gameRenderers["clasifica-animales"] = function (area) {
+  const categories = [
+    { id: "mamifero", label: "🦁 Mamífero", color: "#e17055" },
+    { id: "ave", label: "🦜 Ave", color: "#6c5ce7" },
+    { id: "reptil", label: "🦎 Reptil", color: "#00b894" },
+    { id: "anfibio", label: "🐸 Anfibio", color: "#0984e3" },
+    { id: "insecto", label: "🐝 Insecto", color: "#fdcb6e" },
   ];
 
+  const allAnimals = [
+    { emoji: "🐘", name: "Elefante", cat: "mamifero" },
+    { emoji: "🦅", name: "Águila", cat: "ave" },
+    { emoji: "🐊", name: "Cocodrilo", cat: "reptil" },
+    { emoji: "🐸", name: "Rana", cat: "anfibio" },
+    { emoji: "🦋", name: "Mariposa", cat: "insecto" },
+    { emoji: "🐬", name: "Delfín", cat: "mamifero" },
+    { emoji: "🦜", name: "Guacamaya", cat: "ave" },
+    { emoji: "🐍", name: "Serpiente", cat: "reptil" },
+    { emoji: "🦎", name: "Salamandra", cat: "anfibio" },
+    { emoji: "🐝", name: "Abeja", cat: "insecto" },
+    { emoji: "🐺", name: "Lobo", cat: "mamifero" },
+    { emoji: "🦉", name: "Búho", cat: "ave" },
+    { emoji: "🐢", name: "Tortuga", cat: "reptil" },
+    { emoji: "🐊", name: "Ajolote", cat: "anfibio" },
+    { emoji: "🐛", name: "Oruga", cat: "insecto" },
+  ];
+
+  const pool = shuffle([...allAnimals]).slice(0, 10);
   let current = 0,
     score = 0;
 
   function render() {
-    if (current >= questions.length) {
-      area.innerHTML = `<div class="game-result"><h2>🎉 ¡Terminaste!</h2><p>Puntaje: ${score} / ${questions.length}</p><button class="game-btn" onclick="gameRenderers['cuerpo-humano'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
+    if (current >= pool.length) {
+      renderMathMedal(score, pool.length, area, "clasifica-animales");
       return;
     }
-    const q = questions[current];
+    const animal = pool[current];
+    const catInfo = categories.find((c) => c.id === animal.cat);
+
     area.innerHTML = `
-      <div class="quiz-container">
-        <p class="math-score">Puntaje: ${score} / ${questions.length} &nbsp;|&nbsp; Pregunta ${current + 1}</p>
-        <p class="quiz-question">${q.q}</p>
-        <div class="multi-options">${q.options.map((o) => `<button class="option-btn" data-val="${o}">${o}</button>`).join("")}</div>
-        <p id="quiz-fb" class="math-feedback"></p>
+      <div class="clasifica-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">🦁 Clasifica los Animales</span>
+          <span class="math-score">Puntaje: ${score} / ${pool.length} | Animal ${current + 1}</span>
+        </div>
+        <button class="fono-audio-btn" id="cls-listen" style="margin-bottom:8px;">🔊 Escuchar</button>
+        <div class="clasifica-animal bounce">${animal.emoji}</div>
+        <p class="clasifica-name">${animal.name}</p>
+        <p class="fono-instruction">¿A qué categoría pertenece?</p>
+        <div class="clasifica-cats" id="cls-cats">
+          ${categories
+            .map(
+              (c) => `
+            <button class="cat-btn" data-cat="${c.id}" style="--cat-color:${c.color}">
+              ${c.label}
+            </button>`,
+            )
+            .join("")}
+        </div>
+        <p id="cls-feedback" class="math-feedback"></p>
       </div>`;
 
-    area.querySelector(".multi-options").addEventListener("click", (e) => {
-      const btn = e.target.closest(".option-btn");
+    setTimeout(() => narrateText(`${animal.name}. ¿Es un mamífero, ave, reptil, anfibio o insecto?`), 300);
+    document
+      .getElementById("cls-listen")
+      .addEventListener("click", () => narrateText(`${animal.name}. ¿Es un mamífero, ave, reptil, anfibio o insecto?`));
+
+    document.getElementById("cls-cats").addEventListener("click", (e) => {
+      const btn = e.target.closest(".cat-btn");
       if (!btn) return;
-      const fb = document.getElementById("quiz-fb");
-      if (btn.dataset.val === q.answer) {
+      const chosen = btn.dataset.cat;
+      const fb = document.getElementById("cls-feedback");
+      area.querySelectorAll(".cat-btn").forEach((b) => (b.disabled = true));
+
+      if (chosen === animal.cat) {
         score++;
-        btn.style.background = "#2ecc71";
-        fb.textContent = "✅ ¡Correcto!";
+        btn.classList.add("cat-correct");
+        fb.textContent = `✅ ¡Correcto! ${animal.name} es un ${catInfo.label}`;
         fb.style.color = "#2ecc71";
+        narrateText(`¡Muy bien! El ${animal.name} es un ${catInfo.label.replace(/[^\w\s]/gi, "")}`);
       } else {
-        btn.style.background = "#e74c3c";
-        fb.textContent = `❌ La respuesta era: ${q.answer}`;
+        btn.classList.add("cat-wrong");
+        area.querySelector(`[data-cat="${animal.cat}"]`).classList.add("cat-correct");
+        fb.textContent = `❌ Es un ${catInfo.label}. Los ${catInfo.label} ${getCatFact(animal.cat)}`;
         fb.style.color = "#e74c3c";
+        narrateText(`El ${animal.name} es un ${catInfo.label.replace(/[^\w\s]/gi, "")}`);
       }
-      area.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
       current++;
-      setTimeout(render, 1000);
+      setTimeout(render, 2000);
     });
+  }
+
+  function getCatFact(cat) {
+    const facts = {
+      mamifero: "tienen pelo y amamantan a sus crías.",
+      ave: "tienen plumas y la mayoría pueden volar.",
+      reptil: "tienen escamas y sangre fría.",
+      anfibio: "viven en agua y tierra, tienen piel húmeda.",
+      insecto: "tienen 6 patas y cuerpo en 3 partes.",
+    };
+    return facts[cat] || "";
   }
   render();
 };
 
-// ── Las Plantas ──────────────────────────────────────────────────────────────
-gameRenderers["plantas"] = function (area) {
-  const parts = [
-    { name: "Raíz", emoji: "🌱", desc: "Absorbe agua y nutrientes del suelo" },
-    { name: "Tallo", emoji: "🌿", desc: "Sostiene la planta y transporta nutrientes" },
-    { name: "Hoja", emoji: "🍃", desc: "Realiza la fotosíntesis" },
-    { name: "Flor", emoji: "🌸", desc: "Órgano de reproducción" },
-    { name: "Fruto", emoji: "🍎", desc: "Contiene las semillas" },
-    { name: "Semilla", emoji: "🫘", desc: "De ella nace una nueva planta" },
+// ── 3. Completa el Cuerpo Humano ─────────────────────────────────────────────
+gameRenderers["cuerpo-humano"] = function (area) {
+  // Cada ronda: se muestra la silueta del cuerpo, un órgano/parte, y el niño debe
+  // arrastrar la etiqueta al lugar correcto o elegir la opción correcta.
+  const bodyParts = [
+    {
+      name: "Cerebro",
+      emoji: "🧠",
+      system: "Sistema Nervioso",
+      position: "Dentro de la cabeza, en la parte superior",
+      fact: "Controla todo el cuerpo y nos permite pensar.",
+      options: ["Cerebro", "Corazón", "Estómago", "Pulmón"],
+    },
+    {
+      name: "Corazón",
+      emoji: "❤️",
+      system: "Sistema Circulatorio",
+      position: "En el pecho, levemente a la izquierda",
+      fact: "Bombea la sangre por todo el cuerpo.",
+      options: ["Hígado", "Corazón", "Riñón", "Pulmón"],
+    },
+    {
+      name: "Pulmones",
+      emoji: "🫁",
+      system: "Sistema Respiratorio",
+      position: "En el pecho, a ambos lados del corazón",
+      fact: "Nos permiten respirar; toman oxígeno y eliminan CO₂.",
+      options: ["Pulmones", "Cerebro", "Intestino", "Estómago"],
+    },
+    {
+      name: "Estómago",
+      emoji: "🫃",
+      system: "Sistema Digestivo",
+      position: "En el abdomen, debajo del pecho",
+      fact: "Digiere los alimentos con jugos gástricos.",
+      options: ["Estómago", "Riñón", "Corazón", "Vejiga"],
+    },
+    {
+      name: "Hígado",
+      emoji: "🟤",
+      system: "Sistema Digestivo",
+      position: "En el abdomen, lado derecho",
+      fact: "Filtra toxinas y produce bilis para la digestión.",
+      options: ["Páncreas", "Hígado", "Pulmón", "Bazo"],
+    },
+    {
+      name: "Riñones",
+      emoji: "🫘",
+      system: "Sistema Urinario",
+      position: "Atrás del abdomen, uno a cada lado",
+      fact: "Filtran la sangre y producen orina.",
+      options: ["Riñones", "Pulmones", "Hígado", "Cerebro"],
+    },
+    {
+      name: "Ojos",
+      emoji: "👁️",
+      system: "Órganos de los Sentidos",
+      position: "En la cara, dentro de las cuencas",
+      fact: "Nos permiten ver la luz y los colores.",
+      options: ["Oídos", "Ojos", "Nariz", "Boca"],
+    },
+    {
+      name: "Huesos",
+      emoji: "🦴",
+      system: "Sistema Óseo",
+      position: "En todo el cuerpo, forman el esqueleto",
+      fact: "Protegen órganos y dan forma al cuerpo. Un adulto tiene 206.",
+      options: ["Músculos", "Huesos", "Venas", "Piel"],
+    },
   ];
 
+  const pool = shuffle([...bodyParts]).slice(0, 7);
   let current = 0,
     score = 0;
-  const shuffled = [...parts].sort(() => Math.random() - 0.5);
+
+  // Construir el SVG del cuerpo humano con slots marcados
+  function getBodySvg(highlightPart) {
+    const highlights = {
+      Cerebro: { cx: 100, cy: 38, r: 22, color: "#a29bfe" },
+      Corazón: { cx: 88, cy: 100, r: 14, color: "#e84393" },
+      Pulmones: { cx: 100, cy: 100, r: 20, color: "#74b9ff" },
+      Estómago: { cx: 96, cy: 130, r: 14, color: "#55efc4" },
+      Hígado: { cx: 110, cy: 120, r: 13, color: "#a29bfe" },
+      Riñones: { cx: 100, cy: 145, r: 10, color: "#ffeaa7" },
+      Ojos: { cx: 100, cy: 28, r: 8, color: "#81ecec" },
+      Huesos: { cx: 100, cy: 110, r: 60, color: "#dfe6e9" },
+    };
+    const h = highlights[highlightPart] || { cx: 100, cy: 100, r: 0, color: "transparent" };
+    return `<svg width="140" height="260" viewBox="0 0 200 280" style="filter:drop-shadow(0 4px 8px rgba(0,0,0,.15))">
+      <!-- cabeza -->
+      <circle cx="100" cy="40" r="35" fill="#ffd7b5" stroke="#e0a070" stroke-width="2"/>
+      <!-- ojos -->
+      <circle cx="88" cy="35" r="5" fill="#555"/><circle cx="112" cy="35" r="5" fill="#555"/>
+      <!-- boca -->
+      <path d="M88 52 Q100 62 112 52" stroke="#c0392b" stroke-width="2" fill="none"/>
+      <!-- cuello -->
+      <rect x="88" y="73" width="24" height="18" rx="4" fill="#ffd7b5" stroke="#e0a070" stroke-width="1"/>
+      <!-- torso -->
+      <rect x="60" y="88" width="80" height="90" rx="12" fill="#b2bec3" stroke="#636e72" stroke-width="2"/>
+      <!-- línea central -->
+      <line x1="100" y1="88" x2="100" y2="178" stroke="#fff" stroke-width="1.5" stroke-dasharray="4"/>
+      <!-- brazos -->
+      <rect x="24" y="90" width="36" height="80" rx="14" fill="#ffd7b5" stroke="#e0a070" stroke-width="2"/>
+      <rect x="140" y="90" width="36" height="80" rx="14" fill="#ffd7b5" stroke="#e0a070" stroke-width="2"/>
+      <!-- manos -->
+      <circle cx="42"  cy="180" r="14" fill="#ffd7b5" stroke="#e0a070" stroke-width="2"/>
+      <circle cx="158" cy="180" r="14" fill="#ffd7b5" stroke="#e0a070" stroke-width="2"/>
+      <!-- piernas -->
+      <rect x="68"  y="175" width="28" height="90" rx="12" fill="#ffd7b5" stroke="#e0a070" stroke-width="2"/>
+      <rect x="104" y="175" width="28" height="90" rx="12" fill="#ffd7b5" stroke="#e0a070" stroke-width="2"/>
+      <!-- pies -->
+      <ellipse cx="82"  cy="270" rx="20" ry="9" fill="#ffd7b5" stroke="#e0a070" stroke-width="2"/>
+      <ellipse cx="118" cy="270" rx="20" ry="9" fill="#ffd7b5" stroke="#e0a070" stroke-width="2"/>
+      <!-- highlight -->
+      <circle cx="${h.cx}" cy="${h.cy}" r="${h.r}" fill="${h.color}" opacity="0.75">
+        <animate attributeName="r" values="${h.r};${h.r * 1.15};${h.r}" dur="1s" repeatCount="indefinite"/>
+      </circle>
+    </svg>`;
+  }
 
   function render() {
-    if (current >= shuffled.length) {
-      area.innerHTML = `<div class="game-result"><h2>🎉 ¡Conoces las partes de la planta!</h2><p>Puntaje: ${score} / ${parts.length}</p><button class="game-btn" onclick="gameRenderers['plantas'](this.closest('.game-area'))">Jugar de nuevo</button></div>`;
+    if (current >= pool.length) {
+      renderMathMedal(score, pool.length, area, "cuerpo-humano");
       return;
     }
-    const part = shuffled[current];
-    const options = [...parts].sort(() => Math.random() - 0.5).map((p) => p.name);
+    const part = pool[current];
 
     area.innerHTML = `
-      <div class="quiz-container">
-        <p class="math-score">Puntaje: ${score} / ${parts.length} &nbsp;|&nbsp; Parte ${current + 1}</p>
-        <div style="font-size:3rem;margin-bottom:10px;">${part.emoji}</div>
-        <p class="quiz-question">${part.desc}</p>
-        <p style="font-weight:bold;margin-bottom:12px;">¿Qué parte de la planta es?</p>
-        <div class="multi-options">${options.map((o) => `<button class="option-btn" data-val="${o}">${o}</button>`).join("")}</div>
-        <p id="plant-fb" class="math-feedback"></p>
+      <div class="cuerpo-container fadeIn">
+        <div class="fono-header">
+          <span class="fono-badge">🫀 ${part.system}</span>
+          <span class="math-score">Puntaje: ${score} / ${pool.length} | Parte ${current + 1}</span>
+        </div>
+        <button class="fono-audio-btn" id="cb-listen" style="margin-bottom:8px;">🔊 Escuchar</button>
+        <div class="cuerpo-layout">
+          <div class="cuerpo-svg">${getBodySvg(part.name)}</div>
+          <div class="cuerpo-info">
+            <div class="cuerpo-emoji bounce">${part.emoji}</div>
+            <p class="fono-desc">${part.position}</p>
+            <p class="fono-instruction">¿Cuál de estas partes del cuerpo se describe?</p>
+            <div class="multi-options" id="cb-options">
+              ${shuffle(part.options)
+                .map((o) => `<button class="option-btn" data-val="${o}">${o}</button>`)
+                .join("")}
+            </div>
+            <p id="cb-feedback" class="math-feedback"></p>
+          </div>
+        </div>
       </div>`;
 
-    area.querySelector(".multi-options").addEventListener("click", (e) => {
+    setTimeout(() => narrateText(`${part.position}. ¿Qué parte del cuerpo es?`), 400);
+    document.getElementById("cb-listen").addEventListener("click", () => narrateText(`${part.position}. ${part.fact}`));
+
+    document.getElementById("cb-options").addEventListener("click", (e) => {
       const btn = e.target.closest(".option-btn");
       if (!btn) return;
-      const fb = document.getElementById("plant-fb");
+      const fb = document.getElementById("cb-feedback");
+      area.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
       if (btn.dataset.val === part.name) {
         score++;
         btn.style.background = "#2ecc71";
-        fb.textContent = "✅ ¡Correcto!";
+        fb.textContent = `✅ ¡Correcto! ${part.fact}`;
         fb.style.color = "#2ecc71";
+        narrateText(`¡Excelente! ${part.fact}`);
       } else {
         btn.style.background = "#e74c3c";
-        fb.textContent = `❌ Era: ${part.name}`;
+        area.querySelector(`[data-val="${part.name}"]`).style.background = "#2ecc71";
+        fb.textContent = `❌ Era: ${part.name}. ${part.fact}`;
         fb.style.color = "#e74c3c";
+        narrateText(`La respuesta es ${part.name}. ${part.fact}`);
       }
-      area.querySelectorAll(".option-btn").forEach((b) => (b.disabled = true));
       current++;
-      setTimeout(render, 1000);
+      setTimeout(render, 2400);
     });
   }
   render();

@@ -51,19 +51,19 @@ const menuConfig = [
     icon: "🌿",
     games: [
       {
-        id: "animales",
-        label: "Animales y Hábitats",
-        desc: "Descubre dónde viven los animales y sus características.",
+        id: "seres-vivos",
+        label: "Seres Vivos y Medio Ambiente",
+        desc: "Identifica seres vivos, cuida el medio ambiente y aprende sus características.",
+      },
+      {
+        id: "clasifica-animales",
+        label: "Clasifica los Animales",
+        desc: "Arrastra cada animal a su categoría: mamífero, ave, reptil, anfibio o insecto.",
       },
       {
         id: "cuerpo-humano",
-        label: "El Cuerpo Humano",
-        desc: "Aprende las partes del cuerpo humano de forma interactiva.",
-      },
-      {
-        id: "plantas",
-        label: "Las Plantas",
-        desc: "Conoce las partes de las plantas y cómo crecen.",
+        label: "Completa el Cuerpo Humano",
+        desc: "Ubica los órganos y partes del cuerpo en el lugar correcto.",
       },
     ],
   },
