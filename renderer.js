@@ -44,19 +44,70 @@ function buildGameIndex() {
   return index;
 }
 
+// ── Burbuja del gato mascota ──────────────────────────────────────────────────
+const catBubbleMessages = [
+  "¡Elige una materia! 🐾",
+  "¡Vamos a aprender! 🌟",
+  "¡Tú puedes! 💪",
+  "¡Qué divertido! 😸",
+  "¡Soy tu amigo! 🐱",
+];
+let bubbleTimer = null;
+
+function setCatBubble(text) {
+  const bubble = document.getElementById("cat-bubble");
+  if (!bubble) return;
+  bubble.style.opacity = "0";
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => {
+    bubble.textContent = text;
+    bubble.style.animation = "none";
+    void bubble.offsetHeight; // reflow para reiniciar animación
+    bubble.style.animation = "bubblePop 0.4s ease-out";
+    bubble.style.opacity = "1";
+  }, 180);
+}
+
+// Gato parpadea y mueve la cola — clic en el gato muestra mensaje aleatorio
+document.addEventListener("DOMContentLoaded", () => {
+  const cat = document.getElementById("cat-mascot");
+  if (cat) {
+    cat.addEventListener("click", () => {
+      const msg = catBubbleMessages[Math.floor(Math.random() * catBubbleMessages.length)];
+      setCatBubble(msg);
+    });
+  }
+});
+
 // ── Inicializar ───────────────────────────────────────────────────────────────
 buildSidebar();
 const gameDescriptions = buildGameIndex();
 
-// Toggle submenús
+// Toggle submenús — actualiza burbuja del gato con el nombre de la materia
 document.getElementById("menu").addEventListener("click", (e) => {
   const btn = e.target.closest(".menu-btn");
   if (!btn) return;
   const parent = btn.parentElement;
+  const wasOpen = parent.classList.contains("open");
   document.querySelectorAll(".menu-item.open").forEach((item) => {
     if (item !== parent) item.classList.remove("open");
   });
   parent.classList.toggle("open");
+
+  // Actualizar burbuja del gato
+  const materia = menuConfig.find((m) => m.id === btn.dataset.target);
+  if (materia) {
+    setCatBubble(wasOpen ? "¡Elige una materia! 🐾" : `${materia.icon} ${materia.label}`);
+  }
+});
+
+// Hover en submenú — gato muestra el nombre del juego
+document.getElementById("menu").addEventListener("mouseover", (e) => {
+  const link = e.target.closest(".submenu a");
+  if (!link) return;
+  const gameId = link.dataset.game;
+  const info = gameDescriptions[gameId];
+  if (info) setCatBubble(`🎮 ${info.title}`);
 });
 
 // Click en juegos del submenú
@@ -71,6 +122,9 @@ document.getElementById("menu").addEventListener("click", (e) => {
 
   document.querySelectorAll(".submenu a.active").forEach((a) => a.classList.remove("active"));
   link.classList.add("active");
+
+  // Gato celebra
+  setCatBubble(`¡A jugar ${info.title}! 🎉`);
 
   document.getElementById("welcome").style.display = "none";
   const gameView = document.getElementById("game-view");
