@@ -8,61 +8,126 @@ const gameRenderers = {};
 
 // ── Datos compartidos: palabras de fauna y flora del Cauca ───────────────────
 const caucaWords = [
-  { word: "CÓNDOR", syllables: ["CÓN", "DOR"], type: "fauna", desc: "Ave majestuosa que vuela en los Andes del Cauca" },
+  {
+    word: "CÓNDOR",
+    syllables: ["CÓN", "DOR"],
+    type: "fauna",
+    emoji: "🦅",
+    color: "#d5f5e3",
+    desc: "Ave majestuosa que vuela en los Andes del Cauca",
+  },
   {
     word: "ORQUÍDEA",
     syllables: ["OR", "QUÍ", "DE", "A"],
     type: "flora",
+    emoji: "🌸",
+    color: "#fce4ec",
     desc: "Flor exótica que crece en los bosques del Cauca",
   },
-  { word: "GUADUA", syllables: ["GUA", "DU", "A"], type: "flora", desc: "Bambú gigante típico del paisaje caucano" },
+  {
+    word: "GUADUA",
+    syllables: ["GUA", "DU", "A"],
+    type: "flora",
+    emoji: "🎋",
+    color: "#e8f5e9",
+    desc: "Bambú gigante típico del paisaje caucano",
+  },
   {
     word: "COLIBRÍ",
     syllables: ["CO", "LI", "BRÍ"],
     type: "fauna",
+    emoji: "🐦",
+    color: "#e3f2fd",
     desc: "Pequeña ave que se alimenta del néctar de las flores",
   },
-  { word: "TUCÁN", syllables: ["TU", "CÁN"], type: "fauna", desc: "Ave de pico grande y colorido de la selva caucana" },
-  { word: "CEDRO", syllables: ["CE", "DRO"], type: "flora", desc: "Árbol noble de los bosques del Cauca" },
-  { word: "DANTA", syllables: ["DAN", "TA"], type: "fauna", desc: "Mamífero grande también llamado tapir" },
+  {
+    word: "TUCÁN",
+    syllables: ["TU", "CÁN"],
+    type: "fauna",
+    emoji: "🦜",
+    color: "#fff8e1",
+    desc: "Ave de pico grande y colorido de la selva caucana",
+  },
+  {
+    word: "CEDRO",
+    syllables: ["CE", "DRO"],
+    type: "flora",
+    emoji: "🌲",
+    color: "#e8f5e9",
+    desc: "Árbol noble de los bosques del Cauca",
+  },
+  {
+    word: "DANTA",
+    syllables: ["DAN", "TA"],
+    type: "fauna",
+    emoji: "🦛",
+    color: "#f3e5f5",
+    desc: "Mamífero grande también llamado tapir",
+  },
   {
     word: "CEIBA",
     syllables: ["CEI", "BA"],
     type: "flora",
+    emoji: "🌳",
+    color: "#e8f5e9",
     desc: "Árbol gigante sagrado de las comunidades del Cauca",
   },
   {
     word: "ARMADILLO",
     syllables: ["AR", "MA", "DI", "LLO"],
     type: "fauna",
+    emoji: "🦔",
+    color: "#fff3e0",
     desc: "Animal con caparazón que vive en el Cauca",
   },
   {
     word: "HELECHO",
     syllables: ["HE", "LE", "CHO"],
     type: "flora",
+    emoji: "🌿",
+    color: "#e8f5e9",
     desc: "Planta antigua de los bosques húmedos caucanos",
   },
   {
     word: "GUACAMAYA",
     syllables: ["GUA", "CA", "MA", "YA"],
     type: "fauna",
+    emoji: "🦚",
+    color: "#e8eaf6",
     desc: "Ave de plumaje rojo, azul y amarillo",
   },
   {
     word: "BROMELIA",
     syllables: ["BRO", "ME", "LI", "A"],
     type: "flora",
+    emoji: "🌺",
+    color: "#fce4ec",
     desc: "Planta que crece sobre los árboles del Cauca",
   },
-  { word: "ROBLE", syllables: ["RO", "BLE"], type: "flora", desc: "Árbol fuerte de las montañas caucanas" },
+  {
+    word: "ROBLE",
+    syllables: ["RO", "BLE"],
+    type: "flora",
+    emoji: "🍂",
+    color: "#fff8e1",
+    desc: "Árbol fuerte de las montañas caucanas",
+  },
   {
     word: "ZARIGÜEYA",
     syllables: ["ZA", "RI", "GÜE", "YA"],
     type: "fauna",
+    emoji: "🐁",
+    color: "#f5f5f5",
     desc: "Marsupial nocturno de los bosques del Cauca",
   },
-  { word: "FRAILEJÓN", syllables: ["FRAI", "LE", "JÓN"], type: "flora", desc: "Planta del páramo que retiene agua" },
+  {
+    word: "FRAILEJÓN",
+    syllables: ["FRAI", "LE", "JÓN"],
+    type: "flora",
+    emoji: "🌱",
+    color: "#e8f5e9",
+    desc: "Planta del páramo que retiene agua",
+  },
 ];
 
 // ── Utilidades compartidas ───────────────────────────────────────────────────
@@ -136,11 +201,16 @@ gameRenderers["conciencia-fonologica"] = function (area) {
           <span class="fono-badge">${typeLabel} del Cauca</span>
           <span class="math-score">Sílabas: ${correctSyllables} | Palabra ${current + 1}/${pool.length}</span>
         </div>
-        <div class="fono-word-display">
-          <span class="fono-word bounce">${item.word}</span>
-          <button class="fono-audio-btn" id="fono-listen" title="Escuchar">🔊</button>
+        <div style="display:flex;align-items:center;gap:16px;margin:10px 0;background:${item.color};border-radius:16px;padding:12px 18px;border:2px solid rgba(0,0,0,0.07);">
+          <div style="font-size:5.5rem;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,0.12);flex-shrink:0;">${item.emoji}</div>
+          <div style="flex:1;">
+            <div class="fono-word-display" style="margin:0 0 4px;">
+              <span class="fono-word bounce">${item.word}</span>
+              <button class="fono-audio-btn" id="fono-listen" title="Escuchar">🔊</button>
+            </div>
+            <p class="fono-desc" style="margin:0;font-size:0.88rem;">${item.desc}</p>
+          </div>
         </div>
-        <p class="fono-desc">${item.desc}</p>
         <p class="fono-instruction">Selecciona las sílabas en orden correcto:</p>
         <div class="fono-answer" id="fono-answer"></div>
         <div class="fono-options" id="fono-options">
@@ -248,8 +318,13 @@ gameRenderers["lectura-silabica"] = function (area) {
           <span class="fono-badge">${typeLabel} del Cauca</span>
           <span class="math-score">Sílabas: ${correctSyllables} | Palabra ${current + 1}/${pool.length}</span>
         </div>
-        <button class="fono-audio-btn" id="sil-listen" title="Escuchar la palabra" style="font-size:2rem;margin-bottom:8px;">🔊 Escuchar</button>
-        <p class="fono-desc">${item.desc}</p>
+        <div style="display:flex;align-items:center;gap:16px;margin:10px 0;background:${item.color};border-radius:16px;padding:12px 18px;border:2px solid rgba(0,0,0,0.07);">
+          <div style="font-size:5.5rem;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,0.12);flex-shrink:0;">${item.emoji}</div>
+          <div style="flex:1;">
+            <button class="fono-audio-btn" id="sil-listen" title="Escuchar la palabra" style="font-size:1.4rem;margin-bottom:6px;">🔊 Escuchar</button>
+            <p class="fono-desc" style="margin:0;font-size:0.88rem;">${item.desc}</p>
+          </div>
+        </div>
         <div class="silabica-word" id="sil-word">
           ${syls
             .map((s, i) =>
@@ -369,8 +444,13 @@ gameRenderers["vocabulario-contextualizado"] = function (area) {
           <span class="fono-badge">${typeLabel} del Cauca</span>
           <span class="math-score">Sílabas: ${correctSyllables} | Oración ${current + 1}/${pool.length}</span>
         </div>
-        <button class="fono-audio-btn" id="vocab-listen" title="Escuchar">🔊 Escuchar oración</button>
-        ${wordData ? `<p class="fono-desc">Palabra clave: <strong>${wordData.word}</strong> (${wordData.syllables.join(" - ")})</p>` : ""}
+        <div style="display:flex;align-items:center;gap:16px;margin:10px 0;background:${wordData ? wordData.color : "#f0f4f8"};border-radius:16px;padding:12px 18px;border:2px solid rgba(0,0,0,0.07);">
+          <div style="font-size:5.5rem;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,0.12);flex-shrink:0;">${wordData ? wordData.emoji : "🌿"}</div>
+          <div style="flex:1;">
+            <button class="fono-audio-btn" id="vocab-listen" title="Escuchar" style="font-size:1.3rem;margin-bottom:6px;">🔊 Escuchar oración</button>
+            ${wordData ? `<p class="fono-desc" style="margin:0;font-size:0.88rem;">Palabra clave: <strong>${wordData.word}</strong> (${wordData.syllables.join(" - ")})</p>` : ""}
+          </div>
+        </div>
         <p class="fono-instruction">Ordena las palabras para formar la oración:</p>
         <div class="ordena-answer" id="vocab-answer" style="min-height:48px;padding:10px;background:#e8e5ff;border-radius:12px;margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;"></div>
         <div class="ordena-options" id="vocab-options" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;"></div>
