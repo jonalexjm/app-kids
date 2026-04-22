@@ -281,6 +281,17 @@ body {
   flex-direction: column;
   align-items: center;
   line-height: 1.2;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 10px;
+  padding: 4px 8px;
+  transition: background 0.2s;
+}
+.sidebar-title:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.sidebar-title:active {
+  background: rgba(255, 255, 255, 0.32);
 }
 .sidebar-title-main {
   font-size: 1.5rem;
@@ -753,6 +764,142 @@ body {
 .mem-card.matched {
   border-color: #00b894;
   background: #d4ffef;
+  cursor: default;
+}
+
+/* ─ Rompecabezas del Cauca ───────────────── */
+.puz-board {
+  display: grid;
+  gap: 8px;
+  max-width: 560px;
+  margin: 6px auto 8px;
+}
+
+.puz-piece {
+  aspect-ratio: 16 / 10;
+  border: 3px solid #e0d7ff;
+  border-radius: 12px;
+  background-color: #f4f0ff;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition:
+    transform 0.12s,
+    box-shadow 0.16s,
+    border-color 0.16s;
+}
+
+.puz-piece:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 18px rgba(108, 92, 231, 0.18);
+}
+
+.puz-piece.selected {
+  border-color: #ff6b9d;
+  box-shadow: 0 0 0 2px rgba(255, 107, 157, 0.2);
+}
+
+.puz-piece:disabled {
+  cursor: default;
+  opacity: 0.95;
+}
+
+.puz-next-btn {
+  margin-left: 8px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #4d79ff, #6c5ce7);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ─ Cuentos afros ilustrados ─────────────── */
+.story-selectors {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.story-chip {
+  border: 2px solid #e0d7ff;
+  background: #f6f3ff;
+  color: #534c78;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.story-chip.active {
+  border-color: #6c5ce7;
+  background: #e9e2ff;
+  color: #3f2ea6;
+}
+
+.story-card {
+  border-radius: 16px;
+  border: 2px solid #efe7ff;
+  background: #fff;
+  padding: 10px;
+}
+
+.story-image {
+  width: 100%;
+  border-radius: 12px;
+  border: 2px solid #f0ebff;
+  background: #f8f5ff;
+  display: block;
+}
+
+.story-text {
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #2d3436;
+  background: #faf8ff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 10px 0;
+}
+
+.story-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.story-action-btn,
+.story-nav-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-weight: 800;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.story-action-btn {
+  background: #6c5ce7;
+  color: #fff;
+}
+
+.story-action-btn.stop {
+  background: #e17055;
+}
+
+.story-nav-btn {
+  background: #f3ecff;
+  color: #5a488f;
+  border: 2px solid #e0d7ff;
+}
+
+.story-nav-btn:disabled {
+  opacity: 0.55;
   cursor: default;
 }
 

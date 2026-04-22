@@ -68,7 +68,17 @@ function setCatBubble(text) {
   }, 180);
 }
 
-// Gato parpadea y mueve la cola — clic en el gato muestra mensaje aleatorio
+// ── Volver al inicio ─────────────────────────────────────────────────────────
+function goHome() {
+  if (typeof stopNarration === "function") stopNarration();
+  document.querySelectorAll(".submenu a.active").forEach((a) => a.classList.remove("active"));
+  document.querySelectorAll(".menu-item.open").forEach((item) => item.classList.remove("open"));
+  document.getElementById("game-view").style.display = "none";
+  document.getElementById("welcome").style.display = "";
+  setCatBubble("🏠 ¡De vuelta al inicio!");
+}
+
+// Gato + logo: clic en gato → mensaje, clic en logo → volver al inicio
 document.addEventListener("DOMContentLoaded", () => {
   const cat = document.getElementById("cat-mascot");
   if (cat) {
@@ -76,6 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const msg = catBubbleMessages[Math.floor(Math.random() * catBubbleMessages.length)];
       setCatBubble(msg);
     });
+  }
+  const logo = document.querySelector(".sidebar-title");
+  if (logo) {
+    logo.title = "🏠 Volver al inicio";
+    logo.addEventListener("click", goHome);
   }
 });
 
@@ -429,97 +444,213 @@ const gameDescriptions = buildGameIndex();
     });
   }
 
-  // ── Juego 2: ¿Cuál no va? (discriminación visual) ────────────────────────
-  function runDiferente() {
-    const pool = [
-      "🐱",
-      "🐶",
-      "🦋",
-      "⭐",
-      "🍎",
-      "🚗",
-      "🎈",
-      "🌸",
-      "🦄",
-      "🎊",
-      "🍭",
-      "🌈",
-      "🔥",
-      "💎",
-      "🎵",
-      "🌺",
-      "🐠",
-      "🦊",
-      "🏆",
-      "🍦",
-      "🐸",
-      "🦖",
+  // ── Juego 2: Rompecabezas del Cauca (imágenes temáticas) ──────────────────
+  function runRompecabezas() {
+    const themes = [
+      {
+        title: "Volcán Purace",
+        svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'>
+          <defs><linearGradient id='s' x1='0' x2='0' y1='0' y2='1'><stop offset='0%' stop-color='#87ceeb'/><stop offset='100%' stop-color='#d4f1ff'/></linearGradient></defs>
+          <rect width='600' height='400' fill='url(#s)'/>
+          <circle cx='500' cy='70' r='36' fill='#ffd166'/>
+          <polygon points='130,360 300,120 470,360' fill='#5f5f72'/>
+          <polygon points='252,188 300,120 348,188' fill='#ffffff'/>
+          <ellipse cx='300' cy='100' rx='80' ry='26' fill='#e6e6e6'/>
+          <ellipse cx='330' cy='84' rx='62' ry='20' fill='#f2f2f2'/>
+          <rect y='350' width='600' height='50' fill='#64b66f'/>
+        </svg>`,
+      },
+      {
+        title: "Ciudad de Popayán",
+        svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'>
+          <rect width='600' height='400' fill='#bde7ff'/>
+          <rect y='300' width='600' height='100' fill='#a7c7a0'/>
+          <rect x='80' y='160' width='130' height='140' fill='#fff'/>
+          <rect x='240' y='130' width='140' height='170' fill='#fff'/>
+          <rect x='410' y='175' width='110' height='125' fill='#fff'/>
+          <rect x='286' y='90' width='46' height='40' fill='#f5f5f5'/>
+          <rect x='160' y='220' width='24' height='40' fill='#b3d9ff'/>
+          <rect x='280' y='200' width='24' height='40' fill='#b3d9ff'/>
+          <rect x='330' y='200' width='24' height='40' fill='#b3d9ff'/>
+          <rect x='445' y='220' width='24' height='40' fill='#b3d9ff'/>
+          <path d='M285 90 h48 l-24 -40 z' fill='#e8e8e8'/>
+          <text x='300' y='345' text-anchor='middle' font-size='30' fill='#444' font-family='Arial'>Popayan</text>
+        </svg>`,
+      },
+      {
+        title: "Bailes Típicos",
+        svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'>
+          <rect width='600' height='400' fill='#ffe8d6'/>
+          <rect y='320' width='600' height='80' fill='#f4a261'/>
+          <circle cx='210' cy='130' r='30' fill='#f1c27d'/>
+          <circle cx='390' cy='130' r='30' fill='#8d5524'/>
+          <path d='M170 280 q40 -110 80 0 z' fill='#ff5d8f'/>
+          <path d='M350 280 q40 -110 80 0 z' fill='#4d79ff'/>
+          <rect x='203' y='160' width='14' height='80' fill='#f1c27d'/>
+          <rect x='383' y='160' width='14' height='80' fill='#8d5524'/>
+          <path d='M120 290 q90 -40 180 0' stroke='#d1495b' stroke-width='8' fill='none'/>
+          <path d='M300 290 q90 -40 180 0' stroke='#2a9d8f' stroke-width='8' fill='none'/>
+        </svg>`,
+      },
+      {
+        title: "Chirimía",
+        svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'>
+          <rect width='600' height='400' fill='#fefae0'/>
+          <rect y='300' width='600' height='100' fill='#95d5b2'/>
+          <circle cx='170' cy='140' r='26' fill='#f1c27d'/>
+          <circle cx='300' cy='130' r='26' fill='#8d5524'/>
+          <circle cx='430' cy='140' r='26' fill='#f1c27d'/>
+          <rect x='162' y='165' width='16' height='80' fill='#f1c27d'/>
+          <rect x='292' y='155' width='16' height='80' fill='#8d5524'/>
+          <rect x='422' y='165' width='16' height='80' fill='#f1c27d'/>
+          <rect x='120' y='210' width='100' height='16' rx='8' fill='#264653'/>
+          <rect x='250' y='200' width='100' height='16' rx='8' fill='#e76f51'/>
+          <circle cx='430' cy='220' r='34' fill='#2a9d8f'/>
+          <circle cx='430' cy='220' r='18' fill='#fefae0'/>
+        </svg>`,
+      },
+      {
+        title: "Raíces Afro",
+        svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'>
+          <rect width='600' height='400' fill='#f5efe6'/>
+          <rect y='310' width='600' height='90' fill='#c0a98f'/>
+          <circle cx='220' cy='135' r='38' fill='#5c3b2e'/>
+          <circle cx='380' cy='135' r='38' fill='#3b251d'/>
+          <path d='M180 280 q40 -110 80 0 z' fill='#ef476f'/>
+          <path d='M340 280 q40 -110 80 0 z' fill='#118ab2'/>
+          <circle cx='220' cy='85' r='26' fill='#1d1d1d'/>
+          <circle cx='380' cy='85' r='26' fill='#1d1d1d'/>
+          <text x='300' y='350' text-anchor='middle' font-size='28' fill='#5b3d2e' font-family='Arial'>Cultura Afro</text>
+        </svg>`,
+      },
+      {
+        title: "Comidas Típicas",
+        svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'>
+          <rect width='600' height='400' fill='#fff5e6'/>
+          <rect y='310' width='600' height='90' fill='#ffd6a5'/>
+          <ellipse cx='300' cy='250' rx='180' ry='70' fill='#ffffff' stroke='#e0e0e0' stroke-width='6'/>
+          <circle cx='240' cy='240' r='42' fill='#f77f00'/>
+          <circle cx='310' cy='230' r='32' fill='#e63946'/>
+          <circle cx='360' cy='255' r='30' fill='#2a9d8f'/>
+          <rect x='190' y='130' width='70' height='24' rx='12' fill='#f4a261'/>
+          <rect x='280' y='130' width='90' height='24' rx='12' fill='#e76f51'/>
+          <rect x='390' y='130' width='60' height='24' rx='12' fill='#f4a261'/>
+        </svg>`,
+      },
     ];
-    let round = 0,
-      score = 0,
-      total = 8;
 
-    function renderRound() {
-      const gameEl = document.getElementById("dif-game");
-      if (!gameEl) return;
-      if (round >= total) {
-        const icon = score >= 6 ? "🏆" : score >= 4 ? "⭐" : "💪";
+    const rows = 2;
+    const cols = 3;
+    const total = rows * cols;
+    let orderThemes = [...themes].sort(() => Math.random() - 0.5);
+    let themeIndex = 0;
+    let solvedCount = 0;
+
+    function imageUrl(svg) {
+      return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+    }
+
+    function shuffledPieces() {
+      const arr = Array.from({ length: total }, (_, i) => i);
+      do {
+        arr.sort(() => Math.random() - 0.5);
+      } while (arr.every((n, i) => n === i));
+      return arr;
+    }
+
+    function renderTheme() {
+      const gameEl = document.getElementById("puz-game");
+      const titleEl = document.getElementById("puz-title");
+      const statEl = document.getElementById("puz-stat");
+      const msgEl = document.getElementById("puz-msg");
+      if (!gameEl || !titleEl || !statEl || !msgEl) return;
+
+      if (themeIndex >= orderThemes.length) {
         gameEl.innerHTML = `<div class="wg-final">
-          <div class="wg-final-icon">${icon}</div>
-          <div class="wg-final-text">¡Acertaste <strong>${score}</strong> de ${total}!</div>
-          <button class="wg-replay-btn" id="dif-replay">🔄 Jugar de nuevo</button>
+          <div class="wg-final-icon">🏆</div>
+          <div class="wg-final-text">¡Completaste todos los rompecabezas del Cauca!</div>
+          <button class="wg-replay-btn" id="puz-replay">🔄 Jugar de nuevo</button>
         </div>`;
-        document.getElementById("dif-replay")?.addEventListener("click", runDiferente);
+        document.getElementById("puz-replay")?.addEventListener("click", runRompecabezas);
+        titleEl.textContent = "Rompecabezas del Cauca";
+        statEl.textContent = `✅ ${solvedCount}/${themes.length}`;
+        msgEl.textContent = "";
         return;
       }
-      const idx1 = Math.floor(Math.random() * pool.length);
-      let idx2;
-      do {
-        idx2 = Math.floor(Math.random() * pool.length);
-      } while (idx2 === idx1);
-      const main = pool[idx1],
-        odd = pool[idx2];
-      const oddPos = Math.floor(Math.random() * 4);
-      const options = Array.from({ length: 4 }, (_, i) => (i === oddPos ? odd : main));
 
-      gameEl.innerHTML = `
-        <p class="dif-instruction">¿Cuál es diferente?</p>
-        <div class="dif-options" id="dif-opts"></div>
-        <div class="wg-msg" id="dif-msg"></div>
-      `;
-      const opts = document.getElementById("dif-opts");
-      options.forEach((emoji, i) => {
-        const btn = document.createElement("button");
-        btn.className = "dif-btn";
-        btn.textContent = emoji;
-        btn.addEventListener("click", () => {
-          opts.querySelectorAll(".dif-btn").forEach((b) => (b.disabled = true));
-          if (i === oddPos) {
-            btn.classList.add("correct");
-            score++;
-            document.getElementById("dif-score").textContent = `⭐ ${score}`;
-            document.getElementById("dif-msg").textContent = "✅ ¡Correcto!";
-          } else {
-            btn.classList.add("wrong");
-            opts.querySelectorAll(".dif-btn")[oddPos].classList.add("correct");
-            document.getElementById("dif-msg").textContent = "❌ ¡Casi! Era ese.";
-          }
-          round++;
-          setTimeout(renderRound, 1100);
+      const theme = orderThemes[themeIndex];
+      let pieces = shuffledPieces();
+      let moves = 0;
+      let selectedIndex = -1;
+
+      titleEl.textContent = `🧩 ${theme.title}`;
+      statEl.textContent = `✅ ${solvedCount}/${themes.length}`;
+      msgEl.textContent = "Intercambia dos piezas para armar la imagen.";
+
+      function isSolved() {
+        return pieces.every((val, idx) => val === idx);
+      }
+
+      function draw() {
+        gameEl.innerHTML = "";
+        const board = document.createElement("div");
+        board.className = "puz-board";
+        board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+        pieces.forEach((pieceValue, slotIndex) => {
+          const piece = document.createElement("button");
+          piece.className = "puz-piece";
+          if (slotIndex === selectedIndex) piece.classList.add("selected");
+          const px = pieceValue % cols;
+          const py = Math.floor(pieceValue / cols);
+          piece.style.backgroundImage = imageUrl(theme.svg);
+          piece.style.backgroundSize = `${cols * 100}% ${rows * 100}%`;
+          piece.style.backgroundPosition = `${(px / (cols - 1)) * 100}% ${(py / (rows - 1)) * 100}%`;
+          piece.addEventListener("click", () => {
+            if (selectedIndex === -1) {
+              selectedIndex = slotIndex;
+              draw();
+              return;
+            }
+            if (selectedIndex === slotIndex) {
+              selectedIndex = -1;
+              draw();
+              return;
+            }
+            [pieces[selectedIndex], pieces[slotIndex]] = [pieces[slotIndex], pieces[selectedIndex]];
+            selectedIndex = -1;
+            moves++;
+            draw();
+            if (isSolved()) {
+              solvedCount++;
+              statEl.textContent = `✅ ${solvedCount}/${themes.length}`;
+              msgEl.innerHTML = `🎉 ¡Listo en ${moves} movimientos! <button class="puz-next-btn" id="puz-next">Siguiente</button>`;
+              document.querySelectorAll(".puz-piece").forEach((btn) => (btn.disabled = true));
+              document.getElementById("puz-next")?.addEventListener("click", () => {
+                themeIndex++;
+                renderTheme();
+              });
+            }
+          });
+          board.appendChild(piece);
         });
-        opts.appendChild(btn);
-      });
+
+        gameEl.appendChild(board);
+      }
+
+      draw();
     }
 
     showPanel(`
       <div class="wg-game-header">
         <button class="wg-back-btn">← Volver</button>
-        <span class="wg-game-title">🎯 ¿Cuál no va?</span>
-        <span class="wg-game-stat" id="dif-score">⭐ 0</span>
+        <span class="wg-game-title" id="puz-title">🧩 Rompecabezas del Cauca</span>
+        <span class="wg-game-stat" id="puz-stat">✅ 0/${themes.length}</span>
       </div>
-      <div id="dif-game"></div>
+      <div id="puz-game"></div>
+      <div class="wg-msg" id="puz-msg"></div>
     `);
-    renderRound();
+    renderTheme();
   }
 
   // ── Juego 3: ¡Cuántos hay! (retroalimentación numérica) ──────────────────
@@ -618,14 +749,149 @@ const gameDescriptions = buildGameIndex();
     renderRound();
   }
 
+  // ── Juego 4: Leer cuentos afros con ilustración ────────────────────────────
+  function runCuentos() {
+    const cuentos = [
+      {
+        title: "La Marimba de la Abuela",
+        pages: [
+          {
+            text: "En Guapi, Sara encontró una marimba antigua en la casa de su abuela.",
+            svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 320'><rect width='600' height='320' fill='#ffe8d6'/><circle cx='120' cy='120' r='45' fill='#8d5524'/><rect x='102' y='160' width='36' height='80' fill='#8d5524'/><rect x='220' y='170' width='220' height='20' rx='10' fill='#6d4c41'/><rect x='230' y='145' width='16' height='25' fill='#8d6e63'/><rect x='260' y='145' width='16' height='25' fill='#8d6e63'/><rect x='290' y='145' width='16' height='25' fill='#8d6e63'/><rect x='320' y='145' width='16' height='25' fill='#8d6e63'/><rect x='350' y='145' width='16' height='25' fill='#8d6e63'/><rect x='380' y='145' width='16' height='25' fill='#8d6e63'/></svg>`,
+          },
+          {
+            text: "Cada golpe sonaba como el río: tum, tum, tum... y todo el barrio sonrió.",
+            svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 320'><rect width='600' height='320' fill='#d4f1ff'/><path d='M0 230 Q120 210 240 230 T480 230 T600 230 V320 H0 Z' fill='#4dabf7'/><circle cx='300' cy='120' r='52' fill='#f1c27d'/><path d='M250 210 q50 -90 100 0 z' fill='#ef476f'/><text x='460' y='90' font-size='34' fill='#2a9d8f' font-family='Arial'>Tum Tum</text></svg>`,
+          },
+          {
+            text: "Desde entonces, Sara compartió su música para cuidar la alegría de su comunidad.",
+            svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 320'><rect width='600' height='320' fill='#fefae0'/><circle cx='170' cy='130' r='38' fill='#5c3b2e'/><circle cx='300' cy='130' r='38' fill='#8d5524'/><circle cx='430' cy='130' r='38' fill='#3b251d'/><path d='M130 240 q40 -90 80 0 z' fill='#118ab2'/><path d='M260 240 q40 -90 80 0 z' fill='#ef476f'/><path d='M390 240 q40 -90 80 0 z' fill='#06d6a0'/></svg>`,
+          },
+        ],
+      },
+      {
+        title: "El Tambor del Manglar",
+        pages: [
+          {
+            text: "Nando caminó por el manglar y escuchó un tambor que hablaba con el viento.",
+            svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 320'><rect width='600' height='320' fill='#e8f5e9'/><rect y='230' width='600' height='90' fill='#81c784'/><rect x='120' y='90' width='20' height='180' fill='#5d4037'/><rect x='300' y='70' width='20' height='200' fill='#5d4037'/><rect x='460' y='95' width='20' height='180' fill='#5d4037'/><ellipse cx='290' cy='210' rx='46' ry='38' fill='#8d6e63'/><ellipse cx='290' cy='210' rx='30' ry='24' fill='#bcaaa4'/></svg>`,
+          },
+          {
+            text: "Siguió el ritmo y descubrió que los animales también bailaban en círculo.",
+            svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 320'><rect width='600' height='320' fill='#fff3e0'/><circle cx='300' cy='180' r='96' fill='#ffcc80'/><circle cx='230' cy='160' r='24' fill='#90caf9'/><circle cx='370' cy='160' r='24' fill='#a5d6a7'/><circle cx='300' cy='230' r='24' fill='#f48fb1'/><text x='280' y='80' font-size='36' fill='#ef6c00' font-family='Arial'>♪♪</text></svg>`,
+          },
+          {
+            text: "Nando volvió al pueblo para enseñar que escuchar la naturaleza es sabiduría afro.",
+            svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 320'><rect width='600' height='320' fill='#ede7f6'/><rect y='230' width='600' height='90' fill='#bcaaa4'/><circle cx='300' cy='120' r='50' fill='#3b251d'/><path d='M250 230 q50 -90 100 0 z' fill='#5e35b1'/><text x='300' y='285' text-anchor='middle' font-size='28' fill='#5d4037' font-family='Arial'>Sabiduria</text></svg>`,
+          },
+        ],
+      },
+    ];
+
+    let cuentoIndex = 0;
+    let pageIndex = 0;
+
+    function pageUrl(svg) {
+      return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+    }
+
+    function renderSelectors() {
+      const sel = document.getElementById("story-selectors");
+      if (!sel) return;
+      sel.innerHTML = "";
+      cuentos.forEach((cuento, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "story-chip";
+        if (idx === cuentoIndex) btn.classList.add("active");
+        btn.textContent = cuento.title;
+        btn.addEventListener("click", () => {
+          cuentoIndex = idx;
+          pageIndex = 0;
+          renderSelectors();
+          renderPage();
+        });
+        sel.appendChild(btn);
+      });
+    }
+
+    function renderPage() {
+      const cuento = cuentos[cuentoIndex];
+      const page = cuento.pages[pageIndex];
+      const titleEl = document.getElementById("story-title");
+      const statEl = document.getElementById("story-stat");
+      const imgEl = document.getElementById("story-image");
+      const textEl = document.getElementById("story-text");
+      const prevBtn = document.getElementById("story-prev");
+      const nextBtn = document.getElementById("story-next");
+      if (!titleEl || !statEl || !imgEl || !textEl || !prevBtn || !nextBtn) return;
+
+      titleEl.textContent = `📚 ${cuento.title}`;
+      statEl.textContent = `📄 ${pageIndex + 1}/${cuento.pages.length}`;
+      imgEl.src = pageUrl(page.svg);
+      textEl.textContent = page.text;
+      prevBtn.disabled = pageIndex === 0;
+      nextBtn.textContent = pageIndex === cuento.pages.length - 1 ? "Finalizar" : "Siguiente";
+    }
+
+    showPanel(`
+      <div class="wg-game-header">
+        <button class="wg-back-btn">← Volver</button>
+        <span class="wg-game-title" id="story-title">📚 Cuentos Afros</span>
+        <span class="wg-game-stat" id="story-stat">📄 1/1</span>
+      </div>
+      <div class="story-selectors" id="story-selectors"></div>
+      <div class="story-card">
+        <img id="story-image" class="story-image" alt="Ilustración del cuento afro" />
+        <p id="story-text" class="story-text"></p>
+        <div class="story-actions">
+          <button id="story-listen" class="story-action-btn">🔊 Escuchar</button>
+          <button id="story-stop" class="story-action-btn stop">⏹️ Parar</button>
+          <button id="story-prev" class="story-nav-btn">⬅️ Atrás</button>
+          <button id="story-next" class="story-nav-btn">Siguiente ➡️</button>
+        </div>
+      </div>
+    `);
+
+    renderSelectors();
+    renderPage();
+
+    document.getElementById("story-listen")?.addEventListener("click", () => {
+      const text = document.getElementById("story-text")?.textContent || "";
+      if (typeof narrateText === "function") narrateText(text);
+    });
+
+    document.getElementById("story-stop")?.addEventListener("click", () => {
+      if (typeof stopNarration === "function") stopNarration();
+    });
+
+    document.getElementById("story-prev")?.addEventListener("click", () => {
+      if (pageIndex > 0) {
+        pageIndex--;
+        renderPage();
+      }
+    });
+
+    document.getElementById("story-next")?.addEventListener("click", () => {
+      const cuento = cuentos[cuentoIndex];
+      if (pageIndex < cuento.pages.length - 1) {
+        pageIndex++;
+        renderPage();
+      } else {
+        pageIndex = 0;
+        renderPage();
+      }
+    });
+  }
+
   // Conectar tiles con juegos
   tilesWrap.addEventListener("click", (e) => {
     const tile = e.target.closest(".wg-tile");
     if (!tile) return;
     const game = tile.dataset.wg;
     if (game === "memoria") runMemoria();
-    else if (game === "diferente") runDiferente();
+    else if (game === "rompecabezas") runRompecabezas();
     else if (game === "cuenta") runCuenta();
+    else if (game === "cuentos") runCuentos();
   });
 })();
 
