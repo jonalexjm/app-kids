@@ -1,3 +1,24 @@
+// ── Event listeners para botones de control de ventana ──────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  const minimizeBtn = document.getElementById("minimize-btn");
+  const closeBtn = document.getElementById("close-btn");
+
+  if (minimizeBtn) {
+    minimizeBtn.addEventListener("click", () => {
+      window.electron?.ipcRenderer?.send("minimize-window");
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      // Mostrar confirmación antes de cerrar
+      if (confirm("¿Estás seguro de que deseas cerrar la aplicación?")) {
+        window.electron?.ipcRenderer?.send("close-window");
+      }
+    });
+  }
+});
+
 // ── Construir sidebar desde menuConfig (definido en menu-config.js) ──────────
 function buildSidebar() {
   const menuEl = document.getElementById("menu");
